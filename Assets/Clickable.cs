@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Clickable : MonoBehaviour
 {
+    [SerializeField] GameObject inventory;
     Animator anim;
     [SerializeField] GameObject particle;
     [SerializeField] Transform point;
@@ -37,6 +39,14 @@ public class Clickable : MonoBehaviour
             }
         }else   
             good = true;
+    }
+    private void OnMouseDown()
+    {
+        World world = Object.FindAnyObjectByType<World>();
+        if (world.inGame == false)
+        {
+            inventory.SetActive(!inventory.activeSelf);
+        }
     }
 
     void OnMouseEnter()

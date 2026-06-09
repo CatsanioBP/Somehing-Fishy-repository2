@@ -9,6 +9,9 @@ public class World : MonoBehaviour
     public GameObject[] fish; // 0 is polderfish
     public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point
     public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
+    public FishSCRobject[] fishesPool;
+    FishSCRobject currentFihStats;
+    public Inventory inventoryHolder;
     Transform cam;
     Vector3 defaultCamPos;
     LineRenderer lr;
@@ -55,7 +58,10 @@ public class World : MonoBehaviour
 
             if (!inGame && Input.GetButtonDown("Fire1") && !inGame && !reeling)
             {
+                int randFih = Random.Range(0, 1);
+                currentFihStats = fishesPool[randFih];
                 StartCoroutine(startGame());
+                
             }
         }
         else
@@ -75,6 +81,7 @@ public class World : MonoBehaviour
         anims[0].SetInteger("state", 1);
 
         if(win){
+
             GameObject fih = Instantiate(fish[fishType], props[0].position, Quaternion.identity);
             Vector2 fihpos = fih.transform.position;
 
@@ -112,7 +119,7 @@ public class World : MonoBehaviour
 
             Destroy(fih.gameObject);
             anims[1].SetTrigger("catch");
-
+            inventoryHolder.AddItem(currentFihStats);
             // maybe score it and make the sun emote, words coming from the bucket saying its rarity and a ding sound, should display fish rarity too
         }
         else
@@ -136,7 +143,8 @@ public class World : MonoBehaviour
     public IEnumerator startGame()
     {
         inGame = true;
-        Instantiate(miniGames[0], new Vector3(cam.position.x, 0, 0), Quaternion.identity);
+        int x = Random.Range(0, 2); //x is a num that chooses random minigame,for now we have to so it'd from 0 to 1
+        Instantiate(miniGames[x], new Vector3(cam.position.x, 0, 0), Quaternion.identity);
         yield return null;
     }
     public IEnumerator castIt()
