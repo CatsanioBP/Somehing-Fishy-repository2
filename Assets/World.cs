@@ -58,7 +58,7 @@ public class World : MonoBehaviour
 
             if (!inGame && Input.GetButtonDown("Fire1") && !inGame && !reeling)
             {
-                int randFih = Random.Range(0, 1);
+                int randFih = Random.Range(0, 4);
                 currentFihStats = fishesPool[randFih];
                 StartCoroutine(startGame());
                 
