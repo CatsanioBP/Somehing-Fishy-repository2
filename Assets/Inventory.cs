@@ -74,7 +74,7 @@ public class Inventory : MonoBehaviour
         if (selectedSlot == null)
             return;
         ShopManager sellButton = Object.FindAnyObjectByType<ShopManager>();
-        if (sellButton.canSell == true)
+        if (sellButton.canSell)
         {
             balance += selectedSlot.fish.fishPrice;
             balanceText.text = balance + "$";
