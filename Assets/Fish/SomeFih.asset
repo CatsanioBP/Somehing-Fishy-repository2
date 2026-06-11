@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishSprite: {fileID: 777420897, guid: 03bc07bac56ac8c4690b65f2c0592ac3, type: 3}
   fishPrice: 12
-  fishSize: 2
+  fishSize: 1
   fishName: ChineseFih

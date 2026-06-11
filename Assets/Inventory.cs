@@ -5,6 +5,7 @@ using TMPro;
 
 public class Inventory : MonoBehaviour
 {
+    public float balance = 0;
     public List<FishSCRobject> inventory;
     //public FishSCRobject fih;
     //public Sprite icon;
@@ -12,7 +13,8 @@ public class Inventory : MonoBehaviour
     [SerializeField] Transform[] inventoryPanel;
     [SerializeField] GameObject inventorySlotPrefab;
     [SerializeField] private GameObject itemInfoPanel;
-    [SerializeField] private TMP_Text fishNameText;
+    [SerializeField] private TMP_Text fishNameText,balanceText;
+
     private int slotIndex = 0;
     private InventorySlot selectedSlot;
 
@@ -66,18 +68,21 @@ public class Inventory : MonoBehaviour
             }
         }
     }
-   public void DeleteSelectedItem()
+   public void SellSelectedItem()
     {
+
         if (selectedSlot == null)
             return;
-
-        inventory.Remove(selectedSlot.fish);
-
-        sizeOfInventory += selectedSlot.fish.fishSize;
-
-        Destroy(selectedSlot.gameObject);
-
-        itemInfoPanel.SetActive(false);
-        selectedSlot = null;
+        ShopManager sellButton = Object.FindAnyObjectByType<ShopManager>();
+        if (sellButton.canSell == true)
+        {
+            balance += selectedSlot.fish.fishPrice;
+            balanceText.text = balance + "$";
+            inventory.Remove(selectedSlot.fish);
+            sizeOfInventory += selectedSlot.fish.fishSize;
+            Destroy(selectedSlot.gameObject);
+            itemInfoPanel.SetActive(false);
+            selectedSlot = null;
+        }
     }
 }

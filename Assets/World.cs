@@ -16,7 +16,7 @@ public class World : MonoBehaviour
     Vector3 defaultCamPos;
     LineRenderer lr;
     public GameObject[] miniGames; // 0 is spinny, 1 is pully
-    [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket
+    [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket, 2 is sun
 
     void Start()
     {
@@ -121,11 +121,12 @@ public class World : MonoBehaviour
             anims[1].SetTrigger("catch");
             inventoryHolder.AddItem(currentFihStats);
             // maybe score it and make the sun emote, words coming from the bucket saying its rarity and a ding sound, should display fish rarity too
+            anims[2].SetTrigger("SunSurprised");
         }
         else
         {
             // play a dissapointing "kwaow"
-
+            anims[2].SetTrigger("SunSad");
             while(tmr <= 1f){
                 yield return null;
                 tmr+=Time.deltaTime;
