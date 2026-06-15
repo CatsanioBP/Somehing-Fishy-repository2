@@ -9,18 +9,23 @@ public class Inventory : MonoBehaviour
     public List<FishSCRobject> inventory;
     //public FishSCRobject fih;
     //public Sprite icon;
-    int sizeOfInventory = 4;
+    float sizeOfInventory = 4;
+    //bool isItemInfo = false;
     [SerializeField] Transform[] inventoryPanel;
     [SerializeField] GameObject inventorySlotPrefab;
     [SerializeField] private GameObject itemInfoPanel;
     [SerializeField] private TMP_Text fishNameText,balanceText;
 
-    private int slotIndex = 0;
+    //private int slotIndex = 0;
     private InventorySlot selectedSlot;
 
+    private void Start()
+    {
+        balanceText.text = balance + "$";
+    }
     public void AddItem(FishSCRobject currentFih)
     {
-        if (sizeOfInventory < currentFih.fishSize)
+        if (sizeOfInventory < currentFih.minFishSize)
         {
             Debug.Log("NO SPACE!");
         }
@@ -29,19 +34,22 @@ public class Inventory : MonoBehaviour
             //inventorySlotPrefab.AddComponent<FishSCRobject>().fishName = currentFih.fishName;
             inventory.Add(currentFih);
             CreateInventoryIcon(currentFih);
-            sizeOfInventory -= currentFih.fishSize;
+            sizeOfInventory -= currentFih.minFishSize;
         }
     }
     public void ShowItemInfo(InventorySlot slot)
     {
 
         selectedSlot = slot;
-
         itemInfoPanel.SetActive(true);
-        fishNameText.text = "Name:"+slot.fish.fishName + "\nPrice:" + slot.fish.fishPrice + "\nSize:" +slot.fish.fishSize;
-
-        //deleteButton.onClick.RemoveAllListeners();
-        //deleteButton.onClick.AddListener(DeleteSelectedItem);
+        fishNameText.text = "Name:"+slot.fish.fishName + "\nPrice:" + slot.fish.fishPrice + "\nSize:" + slot.fish.minFishSize + "\nRarity:"
+            + slot.fish.fishRarity + "\nDescription:" + slot.fish.fishDesc;
+        //isItemInfo = true;
+    }
+    public void CloseItemInfo()
+    {
+        itemInfoPanel.SetActive(false);
+        //isItemInfo = false;
     }
     void CreateInventoryIcon(FishSCRobject fish)
     {
@@ -79,7 +87,23 @@ public class Inventory : MonoBehaviour
             balance += selectedSlot.fish.fishPrice;
             balanceText.text = balance + "$";
             inventory.Remove(selectedSlot.fish);
-            sizeOfInventory += selectedSlot.fish.fishSize;
+            sizeOfInventory += selectedSlot.fish.minFishSize;
+            Destroy(selectedSlot.gameObject);
+            itemInfoPanel.SetActive(false);
+            selectedSlot = null;
+        }
+    }
+    public void BaitSelectedItem()
+    {
+        if (selectedSlot == null)
+            return;
+        ShopManager sellButton = Object.FindAnyObjectByType<ShopManager>();
+        if (sellButton.canSell == true)
+        {
+            balance += selectedSlot.fish.fishPrice;
+            balanceText.text = balance + "$";
+            inventory.Remove(selectedSlot.fish);
+            sizeOfInventory += selectedSlot.fish.minFishSize;
             Destroy(selectedSlot.gameObject);
             itemInfoPanel.SetActive(false);
             selectedSlot = null;

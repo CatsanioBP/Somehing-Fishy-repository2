@@ -1,42 +1,90 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using TMPro;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class ShopManager : MonoBehaviour
 {
-    public GameObject ShopMenu,inventory;
-    [SerializeField] Animator fadeInOut;
+    public GameObject ShopMenu,inventory,FishingSceneHolder;
     [SerializeField] bool isItem;
+    [SerializeField] Animator InOutAnim;
+    bool isInventoryActive = false;
     public bool canSell = false;
-    [SerializeField] Text messageText;
-    
+    [SerializeField] TMP_Text messageText;
+
     // Start is called before the first frame update
-    private void OnMouseDown()
+    public void OnMouseDown()
     {
         World world = Object.FindAnyObjectByType<World>();
-        if (world.inGame == false && isItem == false)
+        if (world == null)
         {
-
-            ShopMenu.SetActive(!ShopMenu.activeSelf);
+            Debug.LogError("World not found!");
+            return;
         }
-        else if(world.inGame == true && isItem == false)
+        if (world.CanGo == true && FishingSceneHolder.activeSelf)
         {
-           
+            //Debug.Log("pop2");
+            world.inGame = true;
+            StartCoroutine(Transition(true,world));
+            //ShopMenu.SetActive(!ShopMenu.activeSelf);
+            //FishingSceneHolder.SetActive(!FishingSceneHolder.activeSelf);
+        }
+        else if (world.CanGo == true && !FishingSceneHolder.activeSelf)
+        {
+            //Debug.Log("pop1");
+            world.inGame = true;
+            StartCoroutine(Transition(false,world));
+            //ShopMenu.SetActive(!ShopMenu.activeSelf);
+            //FishingSceneHolder.SetActive(!FishingSceneHolder.activeSelf);
+            //StartCoroutine(world.Transition(true));
         }
     }
+    public IEnumerator Transition(bool InOrOut,World world)
+    {
+        
+        InOutAnim.SetTrigger("Out");
+        
+        yield return new WaitForSeconds(1.2f);
+        //yield return new WaitForSeconds(1f);
+        ShopMenu.SetActive(!ShopMenu.activeSelf);
+        FishingSceneHolder.SetActive(!FishingSceneHolder.activeSelf);
+       // world.inGame = false;
+        InOutAnim.SetTrigger("In");
+        yield return new WaitForSeconds(1.2f);
+        if (FishingSceneHolder.activeSelf)
+        {
+            world.inGame = false;
+        }
+        else
+        {
+            world.inGame = true;
+        }
+        Debug.Log(world.inGame);
+    }
+    //public void LeaveShop()
+    //{
+    //    //Debug.Log("yes");
+    //    OnMouseDown();
+    //}
 
     public void SellFunction()
     {
-        inventory.SetActive(true);
-        messageText.text = "Choose fish to sell";
-        canSell = true;
-    }
-
-// Update is called once per frame
-void Update()
-    {
-        
+        if (!isInventoryActive)
+        {
+            inventory.SetActive(true);
+            isInventoryActive = true;
+            messageText.text = "Choose fish to sell";
+            canSell = true;
+        }
+        else
+        {
+            inventory.SetActive(false);
+            isInventoryActive = false;
+            messageText.text = "";
+            canSell = false;
+        }
     }
 }

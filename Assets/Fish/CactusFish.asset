@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishSprite: {fileID: -946596607, guid: 03bc07bac56ac8c4690b65f2c0592ac3, type: 3}
   fishPrice: 15
-  fishSize: 1
+  minFishSize: 1
   fishName: Cactus Fish
+  fishRarity: Uncommon
+  fishDesc: Ow! Pricking people is rude yknow!...atleast the flower on top is really
+    pretty

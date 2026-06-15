@@ -6,6 +6,7 @@ using UnityEngine;
 public class World : MonoBehaviour
 {
     public bool inGame, canFish = true, reeling; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
+    public bool CanGo = true; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
     public GameObject[] fish; // 0 is polderfish
     public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point
     public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
@@ -16,18 +17,24 @@ public class World : MonoBehaviour
     Vector3 defaultCamPos;
     LineRenderer lr;
     public GameObject[] miniGames; // 0 is spinny, 1 is pully
-    [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket, 2 is sun
+    [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket, 2 is sun, 3 is FadeOut/FadeIn
 
     void Start()
     {
+        //canFish = CanGo = reeling = true;
+        //Debug.Log(" START values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo="+CanGo);
+        //inGame = true;
+        //Transition(true);
         lr = GetComponent<LineRenderer>();
         props[0].gameObject.SetActive(false);
         cam = Camera.main.transform;
         defaultCamPos = cam.transform.position;
     }
+    
 
     void Update()
     {
+        //Debug.Log(" UPDATE values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo=" + CanGo);
         if (Input.GetButton("Fire1") && canFish && !inGame)
         {
             anims[0].SetInteger("state", 1);
@@ -122,6 +129,7 @@ public class World : MonoBehaviour
             inventoryHolder.AddItem(currentFihStats);
             // maybe score it and make the sun emote, words coming from the bucket saying its rarity and a ding sound, should display fish rarity too
             anims[2].SetTrigger("SunSurprised");
+            CanGo = true;
         }
         else
         {
@@ -144,12 +152,13 @@ public class World : MonoBehaviour
     public IEnumerator startGame()
     {
         inGame = true;
-        int x = Random.Range(0, 2); //x is a num that chooses random minigame,for now we have to so it'd from 0 to 1
+        int x = Random.Range(0, 2); //x is a num that chooses random minigame,for now we have to so it'd from 0 to 2(1-SV,0-Spinny)
         Instantiate(miniGames[x], new Vector3(cam.position.x, 0, 0), Quaternion.identity);
         yield return null;
     }
     public IEnumerator castIt()
     {
+        CanGo = false;
         anims[0].SetTrigger("go");
         props[2].position = rodpoints[2].position;
         anims[0].SetInteger("state", 0);

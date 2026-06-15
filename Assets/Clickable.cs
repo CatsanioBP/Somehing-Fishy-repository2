@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Clickable : MonoBehaviour
 {
-    [SerializeField] GameObject inventory;
+    [SerializeField] GameObject inventory,description;
     Animator anim;
     [SerializeField] GameObject particle;
     [SerializeField] Transform point;
@@ -43,10 +43,19 @@ public class Clickable : MonoBehaviour
     private void OnMouseDown()
     {
         World world = Object.FindAnyObjectByType<World>();
-        if (world.inGame == false)
+        if (world.inGame == false && inventory.activeInHierarchy == false)
         {
             inventory.SetActive(!inventory.activeSelf);
+            description.SetActive(false);
+            world.inGame = true;
         }
+        else if(inventory.activeInHierarchy == true)
+        {
+            inventory.SetActive(!inventory.activeSelf);
+            description.SetActive(false);
+            world.inGame = false;
+        }
+
     }
 
     void OnMouseEnter()

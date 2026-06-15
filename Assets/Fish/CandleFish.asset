@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishSprite: {fileID: 777420897, guid: 03bc07bac56ac8c4690b65f2c0592ac3, type: 3}
   fishPrice: 25
-  fishSize: 1
-  fishName: Candle Fish
+  minFishSize: 1
+  fishName: Chinese Lanfish
+  fishRarity: Uncommon
+  fishDesc: When these fish get together in a school, be sure to make a wish!
