@@ -219,11 +219,11 @@ MonoBehaviour:
   fishIcon: {fileID: 6032995213219885825}
   playerBar: {fileID: 4785253442518004999}
   progressBar: {fileID: 7970805362165453217}
-  fishMoveSpeed: 3
-  barMoveSpeed: 400
-  gravity: 300
-  progressFillSpeed: 0.98
-  progressDrainSpeed: 0.1
+  fishMoveSpeed: 4
+  barMoveSpeed: 500
+  gravity: 500
+  progressFillSpeed: 0.5
+  progressDrainSpeed: 0.15
 --- !u!114 &-7219228553081665041
 MonoBehaviour:
   m_ObjectHideFlags: 0

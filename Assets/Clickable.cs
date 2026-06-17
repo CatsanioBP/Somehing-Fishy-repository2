@@ -6,66 +6,97 @@ using UnityEngine;
 
 public class Clickable : MonoBehaviour
 {
-    [SerializeField] GameObject inventory,description;
+    [SerializeField] GameObject inventory,description,baitMenu,baitDesc;
     Animator anim;
     [SerializeField] GameObject particle;
     [SerializeField] Transform point;
+    [SerializeField] bool isBucket;
     AudioSource noise;
     BoxCollider2D box;
     bool good;
 
     void Start()
     {
-        anim = GetComponent<Animator>();
-        if(!point)
-            point = transform;
-        noise = GetComponent<AudioSource>();
+        if (isBucket == true)
+        {
+            anim = GetComponent<Animator>();
+            if (!point)
+                point = transform;
+            noise = GetComponent<AudioSource>();
+        }
         box = GetComponent<BoxCollider2D>();
     }
 
     void Update()
     {
-        if (box.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+        if (isBucket == true)
         {
-            if(!good){
-                good = false;
-                anim.SetTrigger("moved");
+            if (box.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+            {
+                if (!good)
+                {
+                    good = false;
+                    anim.SetTrigger("moved");
 
-            if(particle)
-                Instantiate(particle, point.position, Quaternion.identity);
+                    if (particle)
+                        Instantiate(particle, point.position, Quaternion.identity);
 
-            if(noise)
-                noise.Play();
+                    if (noise)
+                        noise.Play();
+                }
             }
-        }else   
-            good = true;
+            else
+                good = true;
+        }
     }
     private void OnMouseDown()
     {
         World world = Object.FindAnyObjectByType<World>();
-        if (world.inGame == false && inventory.activeInHierarchy == false)
+        if (gameObject.CompareTag("Inventory"))
         {
-            inventory.SetActive(!inventory.activeSelf);
-            description.SetActive(false);
-            world.inGame = true;
+            if (world.inGame == false && inventory.activeInHierarchy == false)
+            {
+                inventory.SetActive(!inventory.activeSelf);
+                description.SetActive(false);
+                world.inGame = true;
+            }
+            else if (inventory.activeInHierarchy == true)
+            {
+                inventory.SetActive(!inventory.activeSelf);
+                description.SetActive(false);
+                world.inGame = false;
+            }
         }
-        else if(inventory.activeInHierarchy == true)
+        if (gameObject.CompareTag("BaitMenu"))
         {
-            inventory.SetActive(!inventory.activeSelf);
-            description.SetActive(false);
-            world.inGame = false;
+            if (world.inGame == false && baitMenu.activeInHierarchy == false)
+            {
+                baitMenu.SetActive(!baitMenu.activeSelf);
+                baitDesc.SetActive(false);
+                world.inGame = true;
+            }
+
+            else if (baitMenu.activeInHierarchy == true)
+            {
+                baitMenu.SetActive(!baitMenu.activeSelf);
+                baitDesc.SetActive(false);
+                world.inGame = false;
+            }
         }
 
     }
 
     void OnMouseEnter()
     {
-        anim.SetTrigger("moved");
+        if (isBucket == true)
+        {
+            anim.SetTrigger("moved");
 
-        if(particle)
-            Instantiate(particle, point.position, Quaternion.identity);
+            if (particle)
+                Instantiate(particle, point.position, Quaternion.identity);
 
-        if(noise)
-            noise.Play();
+            if (noise)
+                noise.Play();
+        }
     }
 }

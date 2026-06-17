@@ -19,11 +19,6 @@ public class ShopManager : MonoBehaviour
     public void OnMouseDown()
     {
         World world = Object.FindAnyObjectByType<World>();
-        if (world == null)
-        {
-            Debug.LogError("World not found!");
-            return;
-        }
         if (world.CanGo == true && FishingSceneHolder.activeSelf)
         {
             //Debug.Log("pop2");
@@ -42,6 +37,7 @@ public class ShopManager : MonoBehaviour
             //StartCoroutine(world.Transition(true));
         }
     }
+
     public IEnumerator Transition(bool InOrOut,World world)
     {
         

@@ -6,11 +6,12 @@ using UnityEngine;
 public class World : MonoBehaviour
 {
     public bool inGame, canFish = true, reeling; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
-    public bool CanGo = true; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
+    public bool CanGo = true,isBaitUsed; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
+    public float chanceFromBait = 0;
     public GameObject[] fish; // 0 is polderfish
     public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point
     public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
-    public FishSCRobject[] fishesPool;
+    public FishSCRobject[] comFishesPool,uncFishesPool,rarFishesPool; //pools of fishes, common,uncommon,rare
     FishSCRobject currentFihStats;
     public Inventory inventoryHolder;
     Transform cam;
@@ -25,6 +26,7 @@ public class World : MonoBehaviour
         //Debug.Log(" START values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo="+CanGo);
         //inGame = true;
         //Transition(true);
+        isBaitUsed = true;
         lr = GetComponent<LineRenderer>();
         props[0].gameObject.SetActive(false);
         cam = Camera.main.transform;
@@ -65,10 +67,40 @@ public class World : MonoBehaviour
 
             if (!inGame && Input.GetButtonDown("Fire1") && !inGame && !reeling)
             {
-                int randFih = Random.Range(0, 4);
-                currentFihStats = fishesPool[randFih];
-                StartCoroutine(startGame());
+                float distanceBoyBopper = Vector2.Distance(props[0].position, props[2].position);
+                Debug.Log(distanceBoyBopper);
+                int randFih = Random.Range(0, 3);
+                float whichPool = Random.Range(0, 50);
+               
+                whichPool += chanceFromBait + distanceBoyBopper;
+                chanceFromBait = 0;
+                //isBaitUsed = true;
+                if(whichPool <= 50)
+                {
+                    //comFishesPool[randFih].minFishSize = Random.Range(comFishesPool[randFih].minFishSize, comFishesPool[randFih].minFishSize * 5);
+                    float currentFishSize = Random.Range(comFishesPool[randFih].minFishSize, comFishesPool[randFih].minFishSize + 2);
+                    float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+
+                    //float finalFishPrice
+                    int finalPrice = (int)comFishesPool[randFih].fishPrice * (int)(roundedNum / comFishesPool[randFih].minFishSize);
+                    currentFihStats = comFishesPool[randFih];
+
+                    currentFihStats.minFishSize = roundedNum;
+                    currentFihStats.fishPrice = finalPrice;
+                    Debug.Log(roundedNum);
+                    Debug.Log(currentFishSize);
+
+                }
+                else if(whichPool > 50 && whichPool <= 84)
+                {
+                    currentFihStats = uncFishesPool[randFih];
+                }
+                else
+                {
+                    currentFihStats = rarFishesPool[randFih];
+                }
                 
+                StartCoroutine(startGame());
             }
         }
         else
@@ -128,7 +160,9 @@ public class World : MonoBehaviour
             anims[1].SetTrigger("catch");
             inventoryHolder.AddItem(currentFihStats);
             // maybe score it and make the sun emote, words coming from the bucket saying its rarity and a ding sound, should display fish rarity too
+            //
             anims[2].SetTrigger("SunSurprised");
+            isBaitUsed = true;
             CanGo = true;
         }
         else

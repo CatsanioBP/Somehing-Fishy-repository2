@@ -9,7 +9,7 @@ public class Inventory : MonoBehaviour
     public List<FishSCRobject> inventory;
     //public FishSCRobject fih;
     //public Sprite icon;
-    float sizeOfInventory = 4;
+    float sizeOfInventory = 25;
     //bool isItemInfo = false;
     [SerializeField] Transform[] inventoryPanel;
     [SerializeField] GameObject inventorySlotPrefab;
@@ -23,6 +23,7 @@ public class Inventory : MonoBehaviour
     {
         balanceText.text = balance + "$";
     }
+
     public void AddItem(FishSCRobject currentFih)
     {
         if (sizeOfInventory < currentFih.minFishSize)
@@ -35,6 +36,7 @@ public class Inventory : MonoBehaviour
             inventory.Add(currentFih);
             CreateInventoryIcon(currentFih);
             sizeOfInventory -= currentFih.minFishSize;
+            Debug.Log(sizeOfInventory);
         }
     }
     public void ShowItemInfo(InventorySlot slot)
@@ -42,8 +44,8 @@ public class Inventory : MonoBehaviour
 
         selectedSlot = slot;
         itemInfoPanel.SetActive(true);
-        fishNameText.text = "Name:"+slot.fish.fishName + "\nPrice:" + slot.fish.fishPrice + "\nSize:" + slot.fish.minFishSize + "\nRarity:"
-            + slot.fish.fishRarity + "\nDescription:" + slot.fish.fishDesc;
+        fishNameText.text = "<b>"+slot.fish.fishName + "</b>" + "\n" + slot.fish.fishPrice + "$\n" + slot.fish.minFishSize + "kg\n"
+            + slot.fish.fishRarity + "\n" + slot.fish.fishDesc;
         //isItemInfo = true;
     }
     public void CloseItemInfo()
@@ -93,20 +95,20 @@ public class Inventory : MonoBehaviour
             selectedSlot = null;
         }
     }
-    public void BaitSelectedItem()
-    {
-        if (selectedSlot == null)
-            return;
-        ShopManager sellButton = Object.FindAnyObjectByType<ShopManager>();
-        if (sellButton.canSell == true)
-        {
-            balance += selectedSlot.fish.fishPrice;
-            balanceText.text = balance + "$";
-            inventory.Remove(selectedSlot.fish);
-            sizeOfInventory += selectedSlot.fish.minFishSize;
-            Destroy(selectedSlot.gameObject);
-            itemInfoPanel.SetActive(false);
-            selectedSlot = null;
-        }
-    }
+    //public void BaitSelectedItem()
+    //{
+    //    if (selectedSlot == null)
+    //        return;
+    //    ShopManager sellButton = Object.FindAnyObjectByType<ShopManager>();
+    //    if (sellButton.canSell == true)
+    //    {
+    //        balance += selectedSlot.fish.fishPrice;
+    //        balanceText.text = balance + "$";
+    //        inventory.Remove(selectedSlot.fish);
+    //        sizeOfInventory += selectedSlot.fish.minFishSize;
+    //        Destroy(selectedSlot.gameObject);
+    //        itemInfoPanel.SetActive(false);
+    //        selectedSlot = null;
+    //    }
+    //}
 }

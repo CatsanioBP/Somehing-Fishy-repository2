@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4aa5c2e8fd9b75145ba6d6d1bd2514e5, type: 3}
+  m_Name: Leech
+  m_EditorClassIdentifier: 
+  baitSprite: {fileID: -2126131975, guid: 73d0c2a236d494c4881cfe561d336135, type: 3}
+  fishPoolNum: 40
+  baitName: Leech
+  baitDesc: Ew, just ew, guaranteed chance for uncommon or higher

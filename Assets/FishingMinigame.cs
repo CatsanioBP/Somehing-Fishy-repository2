@@ -68,9 +68,9 @@ public class FishingMinigame : MonoBehaviour
 
         Vector3 pos = playerBar.localPosition;
         pos.y += barVelocity * Time.deltaTime;
-        pos.y = Mathf.Clamp(pos.y, -450f, 250f); // Keep inside borders
+        pos.y = Mathf.Clamp(pos.y, -400f, 150f); // Keep inside borders
 
-        if (pos.y == -450f || pos.y == 250f) barVelocity = 0; // Reset speed at edges
+        if (pos.y == -400f || pos.y == 150f) barVelocity = 0; // Reset speed at edges
         playerBar.localPosition = pos;
     }
 
@@ -79,7 +79,7 @@ public class FishingMinigame : MonoBehaviour
         // Simple distance overlap validation between the fish icon and catch zone
         float distance = Mathf.Abs(fishIcon.localPosition.y - playerBar.localPosition.y);
 
-        if (distance < 50f) // Threshold size of your green bar
+        if (distance < 65f) // Threshold size of your green bar
         {
             currentProgress += progressFillSpeed * Time.deltaTime;
         }
