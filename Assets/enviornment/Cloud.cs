@@ -11,6 +11,7 @@ public class Cloud : MonoBehaviour
 
     void Start()
     {
+
         sprite = GetComponent<SpriteRenderer>();
         speed = Random.Range(0.05f, 0.5f);
         lifetime = Random.Range(10f, 20f);

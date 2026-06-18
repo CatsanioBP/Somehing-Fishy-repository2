@@ -8,6 +8,7 @@ public class BaitSlot : MonoBehaviour
     public BaitSCRobject bait;
     private BaitManager inventory;
 
+
     public void Setup(BaitSCRobject baitData, BaitManager inv)
     {
         bait = baitData;

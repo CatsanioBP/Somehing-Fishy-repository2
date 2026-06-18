@@ -6,6 +6,7 @@ TagManager:
   tags:
   - BaitMenu
   - Inventory
+  - CloudDeleter
   layers:
   - Default
   - TransparentFX
