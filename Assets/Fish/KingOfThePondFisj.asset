@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 712e6276bd75f5e4fac8f9a83e8ee80c, type: 3}
   m_Name: KingOfThePondFisj
   m_EditorClassIdentifier: 
-  fishSprite: {fileID: -895490732, guid: 03bc07bac56ac8c4690b65f2c0592ac3, type: 3}
+  fishSprite: {fileID: -663328087, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
   fishPrice: 100
-  minFishSize: 1
+  minFishSize: 1.8
   fishName: King of the pond
   fishRarity: Rare
   fishDesc: Self proclaimed king, his crown is actually made of paper

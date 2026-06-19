@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class Inventory : MonoBehaviour
 {
@@ -14,7 +15,10 @@ public class Inventory : MonoBehaviour
     [SerializeField] Transform[] inventoryPanel;
     [SerializeField] GameObject inventorySlotPrefab;
     [SerializeField] private GameObject itemInfoPanel;
-    [SerializeField] private TMP_Text fishNameText,balanceText;
+    [SerializeField] public TMP_Text fishNameText, balanceText;
+    [SerializeField] BaitSCRobject[] meats;
+    [SerializeField] TMP_Text errorMessage;
+    [SerializeField] Animator errorMes;
 
     //private int slotIndex = 0;
     private InventorySlot selectedSlot;
@@ -94,6 +98,41 @@ public class Inventory : MonoBehaviour
             itemInfoPanel.SetActive(false);
             selectedSlot = null;
         }
+    }
+    public void BaitSelectedItem()
+    {
+
+        if (selectedSlot == null)
+            return;
+        BaitManager bait = Object.FindAnyObjectByType<BaitManager>();
+        if (selectedSlot.fish.fishRarity == "Common" && bait.sizeOfInventory > 0)
+        {
+            bait.AddItem(meats[0]);
+        }
+        else if (selectedSlot.fish.fishRarity == "Uncommon" && bait.sizeOfInventory > 0)
+        {
+            bait.AddItem(meats[1]);
+        }
+        else if (selectedSlot.fish.fishRarity == "Rare" && bait.sizeOfInventory > 0)
+        {
+            bait.AddItem(meats[2]);
+        }
+        else if (selectedSlot.fish.fishRarity == "Special" && bait.sizeOfInventory > 0)
+        {
+            bait.AddItem(meats[3]);
+        }
+        else
+        {
+            errorMessage.text = "You don't have place!";
+            errorMes.SetTrigger("Yes");
+            return;
+        }
+        inventory.Remove(selectedSlot.fish);
+        sizeOfInventory += selectedSlot.fish.minFishSize;
+        Destroy(selectedSlot.gameObject);
+        itemInfoPanel.SetActive(false);
+        selectedSlot = null;
+
     }
     //public void BaitSelectedItem()
     //{

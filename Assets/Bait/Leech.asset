@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aa5c2e8fd9b75145ba6d6d1bd2514e5, type: 3}
   m_Name: Leech
   m_EditorClassIdentifier: 
-  baitSprite: {fileID: -2126131975, guid: 73d0c2a236d494c4881cfe561d336135, type: 3}
-  fishPoolNum: 40
+  baitSprite: {fileID: -1216560007, guid: cebbc13b2d92ecb44a68e83d7264a3c9, type: 3}
+  fishPoolNum: -99
   baitName: Leech
-  baitDesc: Ew, just ew, guaranteed chance for uncommon or higher
+  baitDesc: Ew, just ew, something weird can appear...

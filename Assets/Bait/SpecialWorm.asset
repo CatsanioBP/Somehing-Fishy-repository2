@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aa5c2e8fd9b75145ba6d6d1bd2514e5, type: 3}
   m_Name: SpecialWorm
   m_EditorClassIdentifier: 
-  baitSprite: {fileID: -1797441166, guid: 73d0c2a236d494c4881cfe561d336135, type: 3}
+  baitSprite: {fileID: -995141361, guid: cebbc13b2d92ecb44a68e83d7264a3c9, type: 3}
   fishPoolNum: 99
   baitName: Special worm
   baitDesc: All special,guaranteed chance for rare

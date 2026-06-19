@@ -12,7 +12,7 @@ public class BaitManager : MonoBehaviour
     public List<BaitSCRobject> inventory;
     //public FishSCRobject fih;
     //public Sprite icon;
-    float sizeOfInventory = 6;
+    public float sizeOfInventory = 6;
     //bool isItemInfo = false;
     [SerializeField] Transform[] baitInventoryPanel;
     [SerializeField] GameObject inventorySlotPrefab;
@@ -40,7 +40,7 @@ public class BaitManager : MonoBehaviour
     {
         if (sizeOfInventory <= 0)
         {
-            Debug.Log("NO SPACE!");
+            
         }
         else
         {

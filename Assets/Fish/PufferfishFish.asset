@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 712e6276bd75f5e4fac8f9a83e8ee80c, type: 3}
   m_Name: PufferfishFish
   m_EditorClassIdentifier: 
-  fishSprite: {fileID: -307196043, guid: 03bc07bac56ac8c4690b65f2c0592ac3, type: 3}
-  fishPrice: 10
-  minFishSize: 1
+  fishSprite: {fileID: 1550107805, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
+  fishPrice: 40
+  minFishSize: 2
   fishName: Pufferfish
   fishRarity: Common
   fishDesc: Ow! Pricking people is rude yknow!

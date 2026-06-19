@@ -11,7 +11,7 @@ public class World : MonoBehaviour
     public GameObject[] fish; // 0 is polderfish
     public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point
     public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
-    public FishSCRobject[] comFishesPool,uncFishesPool,rarFishesPool; //pools of fishes, common,uncommon,rare
+    public FishSCRobject[] comFishesPool,uncFishesPool,rarFishesPool,specFishesPool; //pools of fishes, common,uncommon,rare,special
     FishSCRobject currentFihStats;
     public Inventory inventoryHolder;
     Transform cam;
@@ -87,17 +87,37 @@ public class World : MonoBehaviour
 
                     currentFihStats.minFishSize = roundedNum;
                     currentFihStats.fishPrice = finalPrice;
-                    Debug.Log(roundedNum);
-                    Debug.Log(currentFishSize);
 
                 }
-                else if(whichPool > 50 && whichPool <= 84)
+                else if(whichPool > 50 && whichPool <= 85)
                 {
+                    float currentFishSize = Random.Range(uncFishesPool[randFih].minFishSize, uncFishesPool[randFih].minFishSize + 2);
+                    float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+
+                    //float finalFishPrice
+                    int finalPrice = (int)uncFishesPool[randFih].fishPrice * (int)(roundedNum / uncFishesPool[randFih].minFishSize);
+                    currentFihStats = uncFishesPool[randFih];
+
+                    currentFihStats.minFishSize = roundedNum;
+                    currentFihStats.fishPrice = finalPrice;
                     currentFihStats = uncFishesPool[randFih];
                 }
-                else
+                else if(whichPool > 85)
                 {
+                    float currentFishSize = Random.Range(rarFishesPool[randFih].minFishSize, rarFishesPool[randFih].minFishSize + 2);
+                    float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+
+                    //float finalFishPrice
+                    int finalPrice = (int)rarFishesPool[randFih].fishPrice * (int)(roundedNum / rarFishesPool[randFih].minFishSize);
                     currentFihStats = rarFishesPool[randFih];
+
+                    currentFihStats.minFishSize = roundedNum;
+                    currentFihStats.fishPrice = finalPrice;
+                    currentFihStats = rarFishesPool[randFih];
+                }
+                else if(whichPool < 0)
+                {
+                    currentFihStats = specFishesPool[randFih];
                 }
                 
                 StartCoroutine(startGame());
