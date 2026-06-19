@@ -17,7 +17,7 @@ public class MainMenu : MonoBehaviour
     public void StartButton()
     {
         
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(1);
         //SceneManager.LoadScene(0);
     }
     public void CreditsManager()

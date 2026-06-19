@@ -1,3 +1,6 @@
+#if UNITY_EDITOR
+using UnityEditorInternal;
+#endif
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
