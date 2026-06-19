@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishSprite: {fileID: 1527938055, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
   fishPrice: 25
-  minFishSize: 1
+  minFishSize: 1.45
   fishName: Chinese Lanfish
   fishRarity: Uncommon
   fishDesc: When these fish get together in a school, be sure to make a wish!

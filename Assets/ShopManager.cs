@@ -30,8 +30,12 @@ public class ShopManager : MonoBehaviour
     [SerializeField] AudioClip FishingLoopMusic;
     [SerializeField] AudioClip ShopAmbient;
     [SerializeField] AudioClip ShopSoundtreck;
-
+    [SerializeField] Sprite[] buttons;
+    [SerializeField] Sprite soldout;
     [SerializeField] float musicFadeTime = 2f;
+    [SerializeField] Animator angler;
+    private bool isUsed1=false,isUsed2=false,isUsed3=false;
+    public static bool isHook = false;
 
     Coroutine currentMusicTransition;
 
@@ -245,6 +249,7 @@ public class ShopManager : MonoBehaviour
         //Inventory inv = Object.FindAnyObjectByType<Inventory>();
         if (inv.balance >= 20)
         {
+            angler.SetTrigger("Yay");
             inv.balance -= 20;
             inv.balanceText.text = inv.balance + "$";
             BaitManager baitInventory = Object.FindAnyObjectByType<BaitManager>();
@@ -253,17 +258,71 @@ public class ShopManager : MonoBehaviour
         }
         else
         {
+            angler.SetTrigger("No");
+
             errorMessage.text = "You don't have such money!";
             erorrAnim.SetTrigger("Yes");
-            return;
         }
     }
     //public void Buy
     public void LineThingButton()
     {
-        if(inv.balance >= 50)
+        if(inv.balance >= 150 && isUsed1 == false)
         {
-            
+            angler.SetTrigger("Yay");
+            isUsed1 = true;
+            World world = Object.FindAnyObjectByType<World>();
+            world.upgradeNum++;
+            inv.balance -= 150;
+            inv.balanceText.text = inv.balance + "$";
+            errorMessage.text = "+ fish size appears!";
+            erorrAnim.SetTrigger("Yes");
+        }
+        else
+        {
+            angler.SetTrigger("No");
+            errorMessage.text = "Not enough $/Not in stock";
+            erorrAnim.SetTrigger("Yes");
         }
     }
+    public void bobberBuy()
+    {
+        if (inv.balance >= 150 && isUsed2 == false)
+        {
+            angler.SetTrigger("Yay");
+            isUsed2 = true;
+            Bobber world = Object.FindAnyObjectByType<Bobber>();
+            world.bobberHelp += 10;
+            inv.balance -= 150;
+            inv.balanceText.text = inv.balance + "$";
+            errorMessage.text = "+ less time to wait bobber!";
+            erorrAnim.SetTrigger("Yes");
+        }
+        else
+        {
+            angler.SetTrigger("No");
+            errorMessage.text = "Not enough $/Not in stock";
+            erorrAnim.SetTrigger("Yes");
+        }
+    }
+    public void HookBuy()
+    {
+        if (inv.balance >= 200 && isUsed2 == false)
+        {
+            angler.SetTrigger("Yay");
+            isUsed2 = true;
+            isHook = true;
+            inv.balance -= 200;
+            inv.balanceText.text = inv.balance + "$";
+            errorMessage.text = "+ Fish is slower!";
+            erorrAnim.SetTrigger("Yes");
+        }
+        else
+        {
+            angler.SetTrigger("No");
+            errorMessage.text = "Not enough $/Not in stock";
+            erorrAnim.SetTrigger("Yes");
+        }
+    }
+
 }

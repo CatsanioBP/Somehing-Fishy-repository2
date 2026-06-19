@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: NeedlefishFish
   m_EditorClassIdentifier: 
   fishSprite: {fileID: 104694984, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
-  fishPrice: 10
-  minFishSize: 6.6
+  fishPrice: 5
+  minFishSize: 1.15
   fishName: Needlefish
   fishRarity: Common
   fishDesc: Now all I need is a threadfish

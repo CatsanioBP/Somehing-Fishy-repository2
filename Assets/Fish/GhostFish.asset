@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishSprite: {fileID: 2017984564, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
   fishPrice: 20
-  minFishSize: 1
+  minFishSize: 0.1
   fishName: Ghost fish
   fishRarity: Uncommon
   fishDesc: How did you even catch this fish?

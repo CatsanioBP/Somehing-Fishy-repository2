@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BookFish
   m_EditorClassIdentifier: 
   fishSprite: {fileID: -1830379498, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
-  fishPrice: 20
-  minFishSize: 1
+  fishPrice: 40
+  minFishSize: 2.15
   fishName: Fisherature Book
   fishRarity: Uncommon
   fishDesc: The bookmarked page is said to hold a secret

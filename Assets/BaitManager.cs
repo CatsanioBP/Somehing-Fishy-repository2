@@ -27,8 +27,8 @@ public class BaitManager : MonoBehaviour
 
     private void Start()
     {
-        AddItem(exampleBait);
-        AddItem(exampleBait);
+        //AddItem(exampleBait);
+        //AddItem(exampleBait);
     }
     private void Update()
     {

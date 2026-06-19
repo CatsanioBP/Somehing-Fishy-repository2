@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aa5c2e8fd9b75145ba6d6d1bd2514e5, type: 3}
   m_Name: SpecialMeat
   m_EditorClassIdentifier: 
-  baitSprite: {fileID: 0}
-  fishPoolNum: 0
-  baitName: 
-  baitDesc: 
+  baitSprite: {fileID: 21300000, guid: 21f5672f8107aa84ebd9a83cb683146d, type: 3}
+  fishPoolNum: -99
+  baitName: Cursed Bait
+  baitDesc: Ew,quaranteed chance for special fish

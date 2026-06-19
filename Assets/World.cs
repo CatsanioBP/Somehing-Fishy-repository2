@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,11 +6,12 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class World : MonoBehaviour
 {
     public bool inGame, canFish = true, reeling; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
-    private bool rewardClaimed;
+    private bool rewardClaimed,dialogueSkipped = false;
     public bool CanGo = true,isBaitUsed; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
     public float chanceFromBait = 0;
     public float sizeHelper=0;
@@ -29,11 +31,14 @@ public class World : MonoBehaviour
     Vector3 defaultCamPos;
     LineRenderer lr;
     public GameObject[] miniGames; // 0 is spinny, 1 is pully
+    [SerializeField] public GameObject dialogue;
+    public string[] listOfAdvices;
     [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket, 2 is sun, 3 is FadeOut/FadeIn
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip actionBucket,swing,pushSound,releaseFSound,fishFall;
     [SerializeField] TMP_Text errorMessage;
     [SerializeField] Animator erorrAnim;
+    public int upgradeNum = 0;
 
     void Start()
     {
@@ -62,8 +67,9 @@ public class World : MonoBehaviour
 
         if (Input.GetButtonUp("Fire1") && canFish && !inGame && !menued && rewardClaimed) // throwing the line
         {
-            CanGo = false;
             if (Camera.main.ScreenToWorldPoint(Input.mousePosition).x > props[2].position.x + 1){
+                CanGo = false;
+
                 audioSource.PlayOneShot(swing);
                 props[0].gameObject.SetActive(true);
                 props[0].transform.position = props[2].transform.position;
@@ -162,7 +168,7 @@ public class World : MonoBehaviour
                             randFih = 3;
                         }
                         currentFihStats = specFishesPool[randFih].Clone();
-                        float currentFishSize = Random.Range(specFishesPool[randFih].minFishSize, specFishesPool[randFih].minFishSize + 2);
+                        float currentFishSize = Random.Range(specFishesPool[randFih].minFishSize, specFishesPool[randFih].minFishSize + 2 + upgradeNum);
                         float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
 
                         //float finalFishPrice
@@ -201,6 +207,7 @@ public class World : MonoBehaviour
             audioSource.Stop();
             audioSource.PlayOneShot(fishFall);
             GameObject fih = Instantiate(fish[fishType], props[0].position, Quaternion.identity);
+            fih.GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
             Vector2 fihpos = fih.transform.position;
 
             while(tmr <= 1f){
@@ -238,18 +245,22 @@ public class World : MonoBehaviour
             Destroy(fih.gameObject);
             anims[1].SetTrigger("catch");
             audioSource.PlayOneShot(actionBucket);
-
-            //inventoryHolder.AddItem(currentFihStats);
-            // maybe score it and make the sun emote, words coming from the bucket saying its rarity and a ding sound, should display fish rarity too
-            //
-            congratsImage.sprite = currentFihStats.fishSprite;
-            congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
-            congratsMenu.SetActive(true);
-            anims[2].SetTrigger("SunSurprised");
-            isBaitUsed = true;
-            CanGo = true;
-            rewardClaimed = false;
-            inGame = false;
+            dialogue.GetComponent<Referencer>().things[0].GetComponent<TextMeshPro>().text = listOfAdvices[Random.Range(0, listOfAdvices.Length)];
+            dialogue.GetComponent<Referencer>().things[1].GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
+            dialogue.GetComponent<Referencer>().things[2].GetComponent<TextMeshPro>().text = currentFihStats.fishName;
+            dialogueSkipped = false;
+            StartCoroutine(slide(1));
+            if (dialogueSkipped == true)
+            {
+                congratsImage.sprite = currentFihStats.fishSprite;
+                congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
+                congratsMenu.SetActive(true);
+                anims[2].SetTrigger("SunSurprised");
+                isBaitUsed = true;
+                CanGo = true;
+                rewardClaimed = false;
+                inGame = false;
+            }
         }
         else
         {
@@ -323,5 +334,57 @@ public class World : MonoBehaviour
     public void congrReturnButton()
     {
         congratsMenu.SetActive(!congratsMenu.activeSelf);
+    }
+
+    IEnumerator slide(float slway)
+    {
+       
+        if (slway == 1)
+            dialogue.SetActive(true);
+
+        float tmr = 0;
+        Vector2 wherego = new Vector2(0, -5 + slway * 2);
+
+        while (tmr < 1.5f)
+        {
+            yield return null;
+            dialogue.transform.position = Vector2.Lerp(dialogue.transform.position, new Vector2(cam.transform.position.x + wherego.x, cam.transform.position.y + wherego.y), Time.deltaTime * 2);
+            tmr += Time.deltaTime;
+        }
+
+        if (slway == -1)
+        {
+            dialogue.SetActive(false);
+            congratsImage.sprite = currentFihStats.fishSprite;
+            congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
+            congratsMenu.SetActive(true);
+            anims[2].SetTrigger("SunSurprised");
+            isBaitUsed = true;
+            CanGo = true;
+            rewardClaimed = false;
+            inGame = false;
+        }
+
+            bool o = false;
+
+        if (slway == 1)
+        {
+            while (!o)
+            {
+                canFish = false;
+                CanGo = false;
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    dialogueSkipped = true;
+                    o = true;
+                }
+                   
+                yield return null;
+            }
+
+            StartCoroutine(slide(-1));
+        }
+
+        canFish = true;
     }
 }

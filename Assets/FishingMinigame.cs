@@ -21,6 +21,7 @@ public class FishingMinigame : MonoBehaviour
     private float barVelocity;
     private float currentProgress = 0.3f;
     private bool isGameActive = false;
+    public float helperHook=0;
 
     public void StartMinigame(FishingSystem system)
     {
@@ -50,7 +51,9 @@ public class FishingMinigame : MonoBehaviour
         }
 
         Vector3 pos = fishIcon.localPosition;
-        pos.y = Mathf.MoveTowards(pos.y, fishTargetY, fishMoveSpeed * Time.deltaTime * 100);
+        if (ShopManager.isHook == true)
+            helperHook++;
+        pos.y = Mathf.MoveTowards(pos.y, fishTargetY, (fishMoveSpeed - helperHook) * Time.deltaTime * 100);
         fishIcon.localPosition = pos;
     }
 
@@ -79,7 +82,7 @@ public class FishingMinigame : MonoBehaviour
         // Simple distance overlap validation between the fish icon and catch zone
         float distance = Mathf.Abs(fishIcon.localPosition.y - playerBar.localPosition.y);
 
-        if (distance < 65f) // Threshold size of your green bar
+        if (distance < 75f) // Threshold size of your green bar
         {
             currentProgress += progressFillSpeed * Time.deltaTime;
         }

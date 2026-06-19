@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: MinnowFish
   m_EditorClassIdentifier: 
   fishSprite: {fileID: 788558370, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
-  fishPrice: 10
-  minFishSize: 16.5
+  fishPrice: 3
+  minFishSize: 0.16
   fishName: Minnow
   fishRarity: Common
   fishDesc: There's plenty of fish in the sea! But we all gotta start somewhere
