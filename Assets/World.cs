@@ -1,24 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class World : MonoBehaviour
 {
     public bool inGame, canFish = true, reeling; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
+    private bool rewardClaimed;
     public bool CanGo = true,isBaitUsed; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
     public float chanceFromBait = 0;
+    public float sizeHelper=0;
+    public GameObject congratsMenu,congratsReturn;
+    [SerializeField] TMP_Text congratsText;
+    [SerializeField] Image congratsImage;
     public GameObject[] fish; // 0 is polderfish
     public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point
     public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
     public FishSCRobject[] comFishesPool,uncFishesPool,rarFishesPool,specFishesPool; //pools of fishes, common,uncommon,rare,special
     FishSCRobject currentFihStats;
     public Inventory inventoryHolder;
+    [HideInInspector] public bool cursorHover, throwing, menued;
+    public static int dayOn = 1;
+    [SerializeField] TextMeshProUGUI dayDisplayer;
     Transform cam;
     Vector3 defaultCamPos;
     LineRenderer lr;
     public GameObject[] miniGames; // 0 is spinny, 1 is pully
     [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket, 2 is sun, 3 is FadeOut/FadeIn
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip actionBucket,swing,pushSound,releaseFSound,fishFall;
+    [SerializeField] TMP_Text errorMessage;
+    [SerializeField] Animator erorrAnim;
 
     void Start()
     {
@@ -26,6 +41,7 @@ public class World : MonoBehaviour
         //Debug.Log(" START values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo="+CanGo);
         //inGame = true;
         //Transition(true);
+        rewardClaimed = true;
         isBaitUsed = true;
         lr = GetComponent<LineRenderer>();
         props[0].gameObject.SetActive(false);
@@ -40,11 +56,15 @@ public class World : MonoBehaviour
         if (Input.GetButton("Fire1") && canFish && !inGame)
         {
             anims[0].SetInteger("state", 1);
+            throwing = true;
         }
+        dayDisplayer.text = "Day " + dayOn;
 
-        if (Input.GetButtonUp("Fire1") && canFish && !inGame) // throwing the line
+        if (Input.GetButtonUp("Fire1") && canFish && !inGame && !menued && rewardClaimed) // throwing the line
         {
-            if(Camera.main.ScreenToWorldPoint(Input.mousePosition).x > props[2].position.x + 1){
+            CanGo = false;
+            if (Camera.main.ScreenToWorldPoint(Input.mousePosition).x > props[2].position.x + 1){
+                audioSource.PlayOneShot(swing);
                 props[0].gameObject.SetActive(true);
                 props[0].transform.position = props[2].transform.position;
                 props[0].GetComponent<Rigidbody2D>().velocity = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - props[2].position) * 1.25f; // maybe better fishing lines throw farther
@@ -67,60 +87,98 @@ public class World : MonoBehaviour
 
             if (!inGame && Input.GetButtonDown("Fire1") && !inGame && !reeling)
             {
-                float distanceBoyBopper = Vector2.Distance(props[0].position, props[2].position);
-                Debug.Log(distanceBoyBopper);
-                int randFih = Random.Range(0, 3);
-                float whichPool = Random.Range(0, 50);
-               
-                whichPool += chanceFromBait + distanceBoyBopper;
-                chanceFromBait = 0;
-                //isBaitUsed = true;
-                if(whichPool <= 50)
+                CanGo = false;
+                if (props[0].GetComponent<Bobber>().bob > 0)
                 {
-                    //comFishesPool[randFih].minFishSize = Random.Range(comFishesPool[randFih].minFishSize, comFishesPool[randFih].minFishSize * 5);
-                    float currentFishSize = Random.Range(comFishesPool[randFih].minFishSize, comFishesPool[randFih].minFishSize + 2);
-                    float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
 
-                    //float finalFishPrice
-                    int finalPrice = (int)comFishesPool[randFih].fishPrice * (int)(roundedNum / comFishesPool[randFih].minFishSize);
-                    currentFihStats = comFishesPool[randFih];
+                    float distanceBoyBopper = Vector2.Distance(props[0].position, props[2].position);
+                    float whichPool = Random.Range(0, 50);
 
-                    currentFihStats.minFishSize = roundedNum;
-                    currentFihStats.fishPrice = finalPrice;
+                    whichPool += chanceFromBait + distanceBoyBopper;
+                    chanceFromBait = 0;
+                    //isBaitUsed = true;
+                    if (whichPool <= 50)
+                    {
+                        int randFih = Random.Range(0, comFishesPool.Length);
+                        currentFihStats = comFishesPool[randFih].Clone();
+                        //comFishesPool[randFih].minFishSize = Random.Range(comFishesPool[randFih].minFishSize, comFishesPool[randFih].minFishSize * 5);
+                        float currentFishSize = Random.Range(currentFihStats.minFishSize, currentFihStats.minFishSize + 2 + sizeHelper);
+                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
 
+                        //float finalFishPrice
+                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
+                        //currentFihStats = comFishesPool[randFih];
+
+                        currentFihStats.minFishSize = roundedNum;
+                        currentFihStats.fishPrice = finalPrice;
+
+                    }
+                    else if (whichPool > 50 && whichPool <= 85)
+                    {
+                        int randFih = Random.Range(0, uncFishesPool.Length);
+                        currentFihStats = uncFishesPool[randFih].Clone();
+                        float currentFishSize = Random.Range(uncFishesPool[randFih].minFishSize, uncFishesPool[randFih].minFishSize + 2);
+                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+
+                        //float finalFishPrice
+                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
+                        //currentFihStats = uncFishesPool[randFih];
+
+                        currentFihStats.minFishSize = roundedNum;
+                        currentFihStats.fishPrice = finalPrice;
+                        //currentFihStats = uncFishesPool[randFih];
+                    }
+                    else if (whichPool > 85)
+                    {
+                        int randFih = Random.Range(0, rarFishesPool.Length);
+                        currentFihStats = rarFishesPool[randFih].Clone();
+                        float currentFishSize = Random.Range(rarFishesPool[randFih].minFishSize, rarFishesPool[randFih].minFishSize + 2);
+                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+
+                        //float finalFishPrice
+                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
+                        //currentFihStats = rarFishesPool[randFih];
+
+                        currentFihStats.minFishSize = roundedNum;
+                        currentFihStats.fishPrice = finalPrice;
+                    }
+                    else if (whichPool < 0)
+                    {
+                        int randFih = Random.Range(0, 999);
+                        if (randFih < 333)
+                        {
+                            randFih = 0;
+                        }
+                        if (randFih >= 333 && randFih < 666)
+                        {
+                            randFih = 1;
+                        }
+                        if (randFih >= 666 && randFih < 999)
+                        {
+                            randFih = 2;
+                        }
+                        if(randFih == 999)
+                        {
+                            randFih = 3;
+                        }
+                        currentFihStats = specFishesPool[randFih].Clone();
+                        float currentFishSize = Random.Range(specFishesPool[randFih].minFishSize, specFishesPool[randFih].minFishSize + 2);
+                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+
+                        //float finalFishPrice
+                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
+                        //currentFihStats = rarFishesPool[randFih];
+
+                        currentFihStats.minFishSize = roundedNum;
+                        currentFihStats.fishPrice = finalPrice;
+                    }
+
+                    StartCoroutine(startGame());
                 }
-                else if(whichPool > 50 && whichPool <= 85)
+                else
                 {
-                    float currentFishSize = Random.Range(uncFishesPool[randFih].minFishSize, uncFishesPool[randFih].minFishSize + 2);
-                    float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
-
-                    //float finalFishPrice
-                    int finalPrice = (int)uncFishesPool[randFih].fishPrice * (int)(roundedNum / uncFishesPool[randFih].minFishSize);
-                    currentFihStats = uncFishesPool[randFih];
-
-                    currentFihStats.minFishSize = roundedNum;
-                    currentFihStats.fishPrice = finalPrice;
-                    currentFihStats = uncFishesPool[randFih];
+                    StartCoroutine(endGame(false));
                 }
-                else if(whichPool > 85)
-                {
-                    float currentFishSize = Random.Range(rarFishesPool[randFih].minFishSize, rarFishesPool[randFih].minFishSize + 2);
-                    float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
-
-                    //float finalFishPrice
-                    int finalPrice = (int)rarFishesPool[randFih].fishPrice * (int)(roundedNum / rarFishesPool[randFih].minFishSize);
-                    currentFihStats = rarFishesPool[randFih];
-
-                    currentFihStats.minFishSize = roundedNum;
-                    currentFihStats.fishPrice = finalPrice;
-                    currentFihStats = rarFishesPool[randFih];
-                }
-                else if(whichPool < 0)
-                {
-                    currentFihStats = specFishesPool[randFih];
-                }
-                
-                StartCoroutine(startGame());
             }
         }
         else
@@ -140,7 +198,8 @@ public class World : MonoBehaviour
         anims[0].SetInteger("state", 1);
 
         if(win){
-
+            audioSource.Stop();
+            audioSource.PlayOneShot(fishFall);
             GameObject fih = Instantiate(fish[fishType], props[0].position, Quaternion.identity);
             Vector2 fihpos = fih.transform.position;
 
@@ -178,15 +237,24 @@ public class World : MonoBehaviour
 
             Destroy(fih.gameObject);
             anims[1].SetTrigger("catch");
-            inventoryHolder.AddItem(currentFihStats);
+            audioSource.PlayOneShot(actionBucket);
+
+            //inventoryHolder.AddItem(currentFihStats);
             // maybe score it and make the sun emote, words coming from the bucket saying its rarity and a ding sound, should display fish rarity too
             //
+            congratsImage.sprite = currentFihStats.fishSprite;
+            congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
+            congratsMenu.SetActive(true);
             anims[2].SetTrigger("SunSurprised");
             isBaitUsed = true;
             CanGo = true;
+            rewardClaimed = false;
+            inGame = false;
         }
         else
         {
+            CanGo = true;
+            audioSource.Stop();
             // play a dissapointing "kwaow"
             anims[2].SetTrigger("SunSad");
             while(tmr <= 1f){
@@ -205,6 +273,7 @@ public class World : MonoBehaviour
     }
     public IEnumerator startGame()
     {
+        audioSource.PlayOneShot(pushSound,0.2f);
         inGame = true;
         int x = Random.Range(0, 2); //x is a num that chooses random minigame,for now we have to so it'd from 0 to 2(1-SV,0-Spinny)
         Instantiate(miniGames[x], new Vector3(cam.position.x, 0, 0), Quaternion.identity);
@@ -212,11 +281,47 @@ public class World : MonoBehaviour
     }
     public IEnumerator castIt()
     {
-        CanGo = false;
+       
         anims[0].SetTrigger("go");
         props[2].position = rodpoints[2].position;
+        while (!props[0].GetComponent<Bobber>().onWater)
+            yield return null;
         anims[0].SetInteger("state", 0);
         yield return new WaitForSeconds(1);
         props[2].position = rodpoints[0].position;
+    }
+    public void TrashFish()
+    {
+        
+        congratsReturn.SetActive(false);
+        audioSource.PlayOneShot(releaseFSound);
+        congratsMenu.SetActive(false);
+        CanGo = true;
+        //inGame = false;
+        rewardClaimed = true;
+    }
+    public void KeepFish()
+    {
+        if (inventoryHolder.sizeOfInventory >= currentFihStats.minFishSize)
+        {
+            congratsReturn.SetActive(false);
+            inventoryHolder.AddItem(currentFihStats);
+            congratsMenu.SetActive(false);
+            CanGo = true;
+            //canFish = true;
+            rewardClaimed = true;
+            //inGame = false;
+        }
+        else
+        {
+            errorMessage.text = "No place in Inventory!";
+            erorrAnim.SetTrigger("Yes");
+            congratsReturn.SetActive(true);
+            congratsMenu.SetActive(false);
+        }
+    }
+    public void congrReturnButton()
+    {
+        congratsMenu.SetActive(!congratsMenu.activeSelf);
     }
 }

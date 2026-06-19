@@ -6,10 +6,12 @@ public class waves : MonoBehaviour
 {
     [SerializeField] float spinSpeed, verticalSpin, horizontalSpin;
     [SerializeField] Transform waveSprt;
+    private AudioSource waveAudioSource;
 
-    void Start()
+    void Awake()
     {
-        
+        // Automatically finds the AudioSource attached to this same GameObject
+        waveAudioSource = GetComponent<AudioSource>();
     }
 
     void Update()

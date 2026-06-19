@@ -7,6 +7,7 @@ TagManager:
   - BaitMenu
   - Inventory
   - CloudDeleter
+  - Waves
   layers:
   - Default
   - TransparentFX

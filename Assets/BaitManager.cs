@@ -19,6 +19,8 @@ public class BaitManager : MonoBehaviour
     [SerializeField] private GameObject itemInfoPanel;
     [SerializeField] private TMP_Text baitNameText;
     [SerializeField] BaitSCRobject exampleBait;
+    [SerializeField] TMP_Text errorMessage;
+    [SerializeField] Animator erorrAnim;
 
     //private int slotIndex = 0;
     private BaitSlot selectedSlot;
@@ -90,20 +92,29 @@ public class BaitManager : MonoBehaviour
     }
     public void ActiveSelectedItem()
     {
+        
         if (selectedSlot == null)
             return;
         //BaitManager sellButton = Object.FindAnyObjectByType<ShopManager>();
         //if (sellButton.canSell)
         //{
         World world = Object.FindAnyObjectByType<World>();
-        world.isBaitUsed = false;
-        world.chanceFromBait += selectedSlot.bait.fishPoolNum;
-        usedBaitImage.sprite = selectedSlot.bait.baitSprite;
-        inventory.Remove(selectedSlot.bait);            
-        Destroy(selectedSlot.gameObject);
-        itemInfoPanel.SetActive(false);
-        selectedSlot = null;
-        sizeOfInventory += 1;
+        if (world.isBaitUsed == true)
+        {
+            world.isBaitUsed = false;
+            world.chanceFromBait += selectedSlot.bait.fishPoolNum;
+            usedBaitImage.sprite = selectedSlot.bait.baitSprite;
+            inventory.Remove(selectedSlot.bait);
+            Destroy(selectedSlot.gameObject);
+            itemInfoPanel.SetActive(false);
+            selectedSlot = null;
+            sizeOfInventory += 1;
+        }
+        else
+        {
+            errorMessage.text = "You can't use 2 baits at the same time!";
+            erorrAnim.SetTrigger("Yes");
+        }
         //}
     }
 }

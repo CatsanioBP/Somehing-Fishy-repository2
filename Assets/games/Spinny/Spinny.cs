@@ -1,53 +1,128 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Spinny : MonoBehaviour
 {
-    public float donePercent, failPercent, direction = 1;
-    float angle, timer;
-    [SerializeField] Transform[] props; // 0 is the spinner gfx, 1 are the arrows
-    [SerializeField] float rotsneeded = 1, failedRotsNeeded = 1, dirgo;
+    [Header("UI")]
+    [SerializeField] Slider progressSlider;
+    [SerializeField] Slider failSlider;
+
+    [Header("Settings")]
+    [SerializeField] float successNeeded = 100f;
+    [SerializeField] float failNeeded = 100f;
+
+    [SerializeField] float progressSpeed = 30f;
+    [SerializeField] float failSpeed = 40f;
+    [SerializeField] float failDecayPerSecond = 15f;
+
+    [SerializeField] int direction = 1; // 1 = clockwise, -1 = counterclockwise
+
+    [Header("Visuals")]
+    [SerializeField] Transform spinnerGraphic;
+    [SerializeField] Transform arrowGraphic;
+
+    float lastAngle;
+    float timer;
 
     void Start()
     {
-        
+        Vector2 dir = transform.position -
+                      Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        lastAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        progressSlider.maxValue = successNeeded;
+        failSlider.maxValue = failNeeded;
+
+        progressSlider.value = 0;
+        failSlider.value = 0;
     }
 
     void Update()
     {
         timer += Time.deltaTime;
 
-        Vector2 dir = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float ngl = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        if(Mathf.Abs(ngl - angle) < 80){
-            donePercent += Mathf.Abs(ngl - angle) * direction / (3.6f * rotsneeded);
+        UpdateSpinner();
+        UpdateArrow();
 
-            if(((ngl - angle) * direction) / ((ngl - angle) * direction) != direction)
+        failSlider.value = Mathf.Max(
+            0,
+            failSlider.value - failDecayPerSecond * Time.deltaTime
+        );
+
+        CheckWinLose();
+    }
+
+    void UpdateSpinner()
+    {
+        Vector2 dir = transform.position -
+                      Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        float currentAngle =
+            Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        float delta =
+            Mathf.DeltaAngle(lastAngle, currentAngle);
+
+        spinnerGraphic.rotation =
+            Quaternion.Euler(0, 0, currentAngle);
+
+        if (Mathf.Abs(delta) > 0.1f)
+        {
+            bool correctDirection =
+                Mathf.Sign(delta) == direction;
+
+            if (correctDirection)
             {
-                failPercent += Mathf.Abs(ngl - angle) * direction / (3.6f * failedRotsNeeded);
+                progressSlider.value +=
+                    Mathf.Abs(delta) * progressSpeed * Time.deltaTime;
             }
             else
             {
-                failPercent -= Mathf.Abs(ngl - angle) * direction / (3.6f * failedRotsNeeded);
+                failSlider.value +=
+                    Mathf.Abs(delta) * failSpeed * Time.deltaTime;
             }
         }
-        angle = ngl;
 
-        props[1].rotation = Quaternion.Euler(0, 0, Mathf.Cos(timer * 3) * 30);
-        props[1].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, -Mathf.Sin(timer * 3));
+        lastAngle = currentAngle;
+    }
 
-        props[0].rotation = Quaternion.Euler(0, 0, angle);
+    void UpdateArrow()
+    {
+        arrowGraphic.rotation =
+            Quaternion.Euler(
+                0,
+                0,
+                Mathf.Cos(timer * 3f) * 30f
+            );
 
-        if(donePercent >= 100) // sucess
+        SpriteRenderer sr =
+            arrowGraphic.GetComponent<SpriteRenderer>();
+
+        Color c = sr.color;
+        c.a = (Mathf.Sin(timer * 3f) + 1f) / 2f;
+        sr.color = c;
+    }
+
+    void CheckWinLose()
+    {
+        if (progressSlider.value >= successNeeded)
         {
-            FindObjectOfType<World>().StartCoroutine(FindObjectOfType<World>().endGame(true));
+            World world = FindAnyObjectByType<World>();
+
+            world.StartCoroutine(world.endGame(true));
+
             Destroy(gameObject);
         }
 
-        if(failPercent >= 100) // fail!
+        if (failSlider.value >= failNeeded)
         {
-            FindObjectOfType<World>().StartCoroutine(FindObjectOfType<World>().endGame(false));
+            World world = FindAnyObjectByType<World>();
+
+            world.StartCoroutine(world.endGame(false));
+
             Destroy(gameObject);
         }
     }

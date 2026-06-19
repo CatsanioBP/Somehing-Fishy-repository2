@@ -22,6 +22,138 @@ public class ShopManager : MonoBehaviour
     [SerializeField] GameObject[] blockSighs;
     [SerializeField] TMP_Text errorMessage;
     [SerializeField] Animator erorrAnim;
+    [SerializeField] AudioSource fishingSource;
+    [SerializeField] AudioSource shopMusicSource;
+    [SerializeField] AudioSource shopAmbientSource;
+
+    [SerializeField] AudioClip FishingStartMusic;
+    [SerializeField] AudioClip FishingLoopMusic;
+    [SerializeField] AudioClip ShopAmbient;
+    [SerializeField] AudioClip ShopSoundtreck;
+
+    [SerializeField] float musicFadeTime = 2f;
+
+    Coroutine currentMusicTransition;
+
+    private void Start()
+    {
+        StartCoroutine(StartFishingMusic());
+    }
+    IEnumerator StartFishingMusic()
+    {
+        fishingSource.Stop();
+
+        fishingSource.clip = FishingStartMusic;
+        fishingSource.loop = false;
+        fishingSource.volume = 1f;
+        fishingSource.pitch = 1f;
+
+        fishingSource.Play();
+
+        yield return new WaitForSeconds(FishingStartMusic.length);
+
+        fishingSource.clip = FishingLoopMusic;
+        fishingSource.loop = true;
+        fishingSource.Play();
+    }
+    public void EnterShopMusic()
+    {
+        if (currentMusicTransition != null)
+            StopCoroutine(currentMusicTransition);
+
+        currentMusicTransition = StartCoroutine(FadeToShop());
+    }
+    IEnumerator FadeToShop()
+    {
+        shopMusicSource.clip = ShopSoundtreck;
+        shopAmbientSource.clip = ShopAmbient;
+
+        shopMusicSource.loop = true;
+        shopAmbientSource.loop = true;
+
+        shopMusicSource.volume = 0;
+        shopAmbientSource.volume = 0;
+
+        shopMusicSource.Play();
+        shopAmbientSource.Play();
+
+        float timer = 0;
+
+        float fishStartVol = fishingSource.volume;
+        float fishStartPitch = fishingSource.pitch;
+
+        while (timer < musicFadeTime)
+        {
+            timer += Time.deltaTime;
+
+            float t = timer / musicFadeTime;
+
+            fishingSource.volume =
+                Mathf.Lerp(fishStartVol, 0f, t);
+
+            fishingSource.pitch =
+                Mathf.Lerp(fishStartPitch, 0.5f, t);
+
+            shopMusicSource.volume =
+                Mathf.Lerp(0f, 1f, t);
+
+            shopAmbientSource.volume =
+                Mathf.Lerp(0f, 1f, t);
+
+            yield return null;
+        }
+
+        fishingSource.Stop();
+
+        fishingSource.volume = 1f;
+        fishingSource.pitch = 1f;
+    }
+    public void LeaveShopMusic()
+    {
+        if (currentMusicTransition != null)
+            StopCoroutine(currentMusicTransition);
+
+        currentMusicTransition = StartCoroutine(FadeToFishing());
+    }
+    IEnumerator FadeToFishing()
+    {
+        fishingSource.clip = FishingLoopMusic;
+        fishingSource.loop = true;
+
+        fishingSource.volume = 0;
+        fishingSource.pitch = 0.5f;
+
+        fishingSource.Play();
+
+        float timer = 0;
+
+        while (timer < musicFadeTime)
+        {
+            timer += Time.deltaTime;
+
+            float t = timer / musicFadeTime;
+
+            fishingSource.volume =
+                Mathf.Lerp(0f, 1f, t);
+
+            fishingSource.pitch =
+                Mathf.Lerp(0.5f, 1f, t);
+
+            shopMusicSource.volume =
+                Mathf.Lerp(1f, 0f, t);
+
+            shopAmbientSource.volume =
+                Mathf.Lerp(1f, 0f, t);
+
+            yield return null;
+        }
+
+        shopMusicSource.Stop();
+        shopAmbientSource.Stop();
+
+        shopMusicSource.volume = 1f;
+        shopAmbientSource.volume = 1f;
+    }
 
     // Start is called before the first frame update
     public void OnMouseDown()
@@ -29,17 +161,14 @@ public class ShopManager : MonoBehaviour
         World world = Object.FindAnyObjectByType<World>();
         if (world.CanGo == true && FishingSceneHolder.activeSelf)
         {
-            if(gameObject.GetComponent<BoxCollider2D>() != null)
+            if (gameObject.GetComponent<BoxCollider2D>() != null)
             {
                 gameObject.GetComponent<BoxCollider2D>().enabled = false;
             }
-            //Debug.Log("pop2");
-            //for(int i = 4;i<blockSighs.Length;i++)
-            //{
-            //    blockSighs[i].SetActive(true);
-            //}
+
+            EnterShopMusic();
             world.inGame = true;
-            StartCoroutine(Transition(true,world));
+            StartCoroutine(Transition(true, world));
             //ShopMenu.SetActive(!ShopMenu.activeSelf);
             //FishingSceneHolder.SetActive(!FishingSceneHolder.activeSelf);
         }
@@ -50,8 +179,11 @@ public class ShopManager : MonoBehaviour
             {
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
             }
+            LeaveShopMusic();
+
             world.inGame = true;
-            StartCoroutine(Transition(false,world));
+            StartCoroutine(Transition(false, world));
+
             //ShopMenu.SetActive(!ShopMenu.activeSelf);
             //FishingSceneHolder.SetActive(!FishingSceneHolder.activeSelf);
             //StartCoroutine(world.Transition(true));

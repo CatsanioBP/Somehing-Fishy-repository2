@@ -10,14 +10,14 @@ public class Inventory : MonoBehaviour
     public List<FishSCRobject> inventory;
     //public FishSCRobject fih;
     //public Sprite icon;
-    float sizeOfInventory = 25;
+    public float sizeOfInventory = 25,icons = 10;
     //bool isItemInfo = false;
     [SerializeField] Transform[] inventoryPanel;
     [SerializeField] GameObject inventorySlotPrefab;
     [SerializeField] private GameObject itemInfoPanel;
     [SerializeField] public TMP_Text fishNameText, balanceText;
     [SerializeField] BaitSCRobject[] meats;
-    [SerializeField] TMP_Text errorMessage;
+    [SerializeField] TMP_Text errorMessage,sizeText;
     [SerializeField] Animator errorMes;
 
     //private int slotIndex = 0;
@@ -25,6 +25,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
+        sizeText.text = $"{sizeOfInventory:F1}" + "kg" + " space left";
         balanceText.text = balance + "$";
     }
 
@@ -32,7 +33,8 @@ public class Inventory : MonoBehaviour
     {
         if (sizeOfInventory < currentFih.minFishSize)
         {
-            Debug.Log("NO SPACE!");
+            errorMessage.text = "No space left!";
+            errorMes.SetTrigger("Yes");
         }
         else
         {
@@ -40,6 +42,8 @@ public class Inventory : MonoBehaviour
             inventory.Add(currentFih);
             CreateInventoryIcon(currentFih);
             sizeOfInventory -= currentFih.minFishSize;
+            icons -= 1;
+            sizeText.text = $"{sizeOfInventory:F1}" + "kg" + " space left";
             Debug.Log(sizeOfInventory);
         }
     }
@@ -93,11 +97,27 @@ public class Inventory : MonoBehaviour
             balance += selectedSlot.fish.fishPrice;
             balanceText.text = balance + "$";
             inventory.Remove(selectedSlot.fish);
+            icons += 1;
             sizeOfInventory += selectedSlot.fish.minFishSize;
+            sizeText.text = $"{sizeOfInventory:F1}" + "kg" + " space left";
             Destroy(selectedSlot.gameObject);
             itemInfoPanel.SetActive(false);
             selectedSlot = null;
         }
+    }
+    public void LetItGoSelectedItem()
+    {
+
+        if (selectedSlot == null)
+            return;
+            inventory.Remove(selectedSlot.fish);
+            icons += 1;
+            sizeOfInventory += selectedSlot.fish.minFishSize;
+        sizeText.text = $"{sizeOfInventory:F1}" + "kg" + " space left";
+        Destroy(selectedSlot.gameObject);
+            itemInfoPanel.SetActive(false);
+            selectedSlot = null;
+        
     }
     public void BaitSelectedItem()
     {
@@ -128,7 +148,9 @@ public class Inventory : MonoBehaviour
             return;
         }
         inventory.Remove(selectedSlot.fish);
+        icons += 1;
         sizeOfInventory += selectedSlot.fish.minFishSize;
+        sizeText.text =$"{sizeOfInventory:F1}" + "kg" + " space left";
         Destroy(selectedSlot.gameObject);
         itemInfoPanel.SetActive(false);
         selectedSlot = null;
