@@ -149,6 +149,13 @@ public class World : MonoBehaviour
         canFish = true;
         reeling = false;
     }
+    private void OnMouseDown()
+    {
+        if(gameObject.CompareTag("SkipDialogue"))
+        {
+            dialogueSkipped = true;
+        }
+    }
     public IEnumerator startGame()
     {
         inGame = true;
