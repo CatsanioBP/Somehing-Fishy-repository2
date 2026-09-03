@@ -3,16 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-<<<<<<< Updated upstream
   tags: []
-=======
-  tags:
-  - BaitMenu
-  - Inventory
-  - CloudDeleter
-  - Waves
-  - SkipDialogue
->>>>>>> Stashed changes
   layers:
   - Default
   - TransparentFX
