@@ -58,28 +58,35 @@ public class World : MonoBehaviour
     void Update()
     {
         //Debug.Log(" UPDATE values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo=" + CanGo);
-        if (Input.GetButton("Fire1") && canFish && !inGame)
+        if (Input.GetButton("Fire1"))
         {
-            anims[0].SetInteger("state", 1);
-            throwing = true;
-        }
-        dayDisplayer.text = "Day " + dayOn;
-
-        if (Input.GetButtonUp("Fire1") && canFish && !inGame && !menued && rewardClaimed) // throwing the line
-        {
-            if (Camera.main.ScreenToWorldPoint(Input.mousePosition).x > props[2].position.x + 1){
-                CanGo = false;
-
-                audioSource.PlayOneShot(swing);
-                props[0].gameObject.SetActive(true);
-                props[0].transform.position = props[2].transform.position;
-                props[0].GetComponent<Rigidbody2D>().velocity = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - props[2].position) * 1.25f; // maybe better fishing lines throw farther
-                canFish = false;
-                StartCoroutine(castIt());
-            }
-            else
+            if (canFish && !inGame && !menued) 
             {
-                anims[0].SetInteger("state", 0);
+                anims[0].SetInteger("state", 1);
+                throwing = true;
+            }
+        }
+        
+
+        if (Input.GetButtonUp("Fire1")) // throwing the line
+        {
+            if (canFish && !inGame && !menued && rewardClaimed)
+            {
+                if (Camera.main.ScreenToWorldPoint(Input.mousePosition).x > props[2].position.x + 1)
+                {
+                    CanGo = false;
+
+                    audioSource.PlayOneShot(swing);
+                    props[0].gameObject.SetActive(true);
+                    props[0].transform.position = props[2].transform.position;
+                    props[0].GetComponent<Rigidbody2D>().velocity = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - props[2].position) * 1.25f; // maybe better fishing lines throw farther
+                    canFish = false;
+                    StartCoroutine(castIt());
+                }
+                else
+                {
+                    anims[0].SetInteger("state", 0);
+                }
             }
         }
 
@@ -91,7 +98,7 @@ public class World : MonoBehaviour
 
             cam.position = Vector3.Lerp(cam.transform.position, new Vector3(Mathf.Clamp(props[0].position.x, 0, 80), defaultCamPos.y, -10), Time.deltaTime * 5);
 
-            if (!inGame && Input.GetButtonDown("Fire1") && !inGame && !reeling)
+            if (!inGame && Input.GetButtonDown("Fire1") && !reeling)
             {
                 CanGo = false;
                 if (props[0].GetComponent<Bobber>().bob > 0)
@@ -150,7 +157,7 @@ public class World : MonoBehaviour
                     }
                     else if (whichPool < 0)
                     {
-                        int randFih = Random.Range(0, 999);
+                        int randFih = Random.Range(0, 1000);
                         if (randFih < 333)
                         {
                             randFih = 0;
@@ -196,6 +203,7 @@ public class World : MonoBehaviour
 
     public IEnumerator endGame(bool win, int fishType = 0)
     {
+        menued = true;
         reeling = true;
         float tmr = 0;
         inGame = false;
@@ -241,7 +249,8 @@ public class World : MonoBehaviour
                 fih.transform.Rotate(0, 0, 360 * Time.deltaTime);
                 fih.transform.position = Vector2.Lerp(fihpos, props[1].position, tmr / 1f);
             }
-
+            
+            isBaitUsed = true;
             Destroy(fih.gameObject);
             anims[1].SetTrigger("catch");
             audioSource.PlayOneShot(actionBucket);
@@ -249,6 +258,7 @@ public class World : MonoBehaviour
             dialogue.GetComponent<Referencer>().things[1].GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
             dialogue.GetComponent<Referencer>().things[2].GetComponent<TextMeshPro>().text = currentFihStats.fishName;
             dialogueSkipped = false;
+            
             StartCoroutine(slide(1));
             if (dialogueSkipped == true)
             {
@@ -256,7 +266,6 @@ public class World : MonoBehaviour
                 congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
                 congratsMenu.SetActive(true);
                 anims[2].SetTrigger("SunSurprised");
-                isBaitUsed = true;
                 CanGo = true;
                 rewardClaimed = false;
                 inGame = false;
@@ -275,6 +284,7 @@ public class World : MonoBehaviour
             }
 
             props[0].gameObject.SetActive(false);
+            menued = false;
         }
 
         anims[0].SetInteger("state", 0);
@@ -310,6 +320,7 @@ public class World : MonoBehaviour
         CanGo = true;
         //inGame = false;
         rewardClaimed = true;
+        menued = false;
     }
     public void KeepFish()
     {
@@ -322,6 +333,7 @@ public class World : MonoBehaviour
             //canFish = true;
             rewardClaimed = true;
             //inGame = false;
+            menued = false;
         }
         else
         {

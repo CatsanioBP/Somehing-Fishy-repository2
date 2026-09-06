@@ -54,6 +54,7 @@ public class FishingMinigame : MonoBehaviour
         if (ShopManager.isHook == true)
             helperHook++;
         pos.y = Mathf.MoveTowards(pos.y, fishTargetY, (fishMoveSpeed - helperHook) * Time.deltaTime * 100);
+       
         fishIcon.localPosition = pos;
     }
 

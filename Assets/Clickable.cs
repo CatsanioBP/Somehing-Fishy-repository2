@@ -56,21 +56,26 @@ public class Clickable : MonoBehaviour
         {
             if (world.inGame == false && inventory.activeInHierarchy == false)
             {
+                world.menued = true;
                 inventory.SetActive(!inventory.activeSelf);
                 description.SetActive(false);
                 world.inGame = true;
             }
             else if (inventory.activeInHierarchy == true)
             {
+               
                 inventory.SetActive(!inventory.activeSelf);
                 description.SetActive(false);
                 world.inGame = false;
+                world.menued = false;
             }
         }
         if (gameObject.CompareTag("BaitMenu"))
         {
+           
             if (world.inGame == false && baitMenu.activeInHierarchy == false)
             {
+                world.menued = true;
                 baitMenu.SetActive(!baitMenu.activeSelf);
                 baitDesc.SetActive(false);
                 world.inGame = true;
@@ -78,6 +83,7 @@ public class Clickable : MonoBehaviour
 
             else if (baitMenu.activeInHierarchy == true)
             {
+                world.menued = false;
                 baitMenu.SetActive(!baitMenu.activeSelf);
                 baitDesc.SetActive(false);
                 world.inGame = false;
