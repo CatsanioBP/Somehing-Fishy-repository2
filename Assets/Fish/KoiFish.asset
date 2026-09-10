@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Koi
   fishRarity: Uncommon
   fishDesc: Rumor has it if you hold it up to the light, it's colors shift!
+  fishIndexNum: 9

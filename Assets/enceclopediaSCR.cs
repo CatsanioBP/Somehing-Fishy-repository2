@@ -9,40 +9,35 @@ public class enceclopediaSCR : MonoBehaviour
     public GameObject[] fishes,pages;
     public int pageCount = 0;
     [SerializeField] TMP_Text pageText;
-    // Start is called before the first frame update
-    void Start()
+    
+    public void AddFish(int fishIndex)
     {
-             
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        fishes[fishIndex].gameObject.SetActive(true);
     }
     public void eRB()
     {
         pages[pageCount].SetActive(false);
         if(pageCount == pages.Length - 1)
         {
-            pageCount = 0;
+            pageCount = 1;
         }
         else
             pageCount++;
-        pageText.text = pageCount + "/20";
+        int a = pages.Length - 1;
+        pageText.text = pageCount + "/" + a;
         pages[pageCount].SetActive(true);
     }
     public void eLB()
     {
         pages[pageCount].SetActive(false);
-        if (pageCount == 0)
+        if (pageCount == 1)
         {
             pageCount = pages.Length-1;
         }
         else
             pageCount--;
-        pageText.text = pageCount + "/20";
+        int a = pages.Length - 1;
+        pageText.text = pageCount + "/" + a;
         pages[pageCount].SetActive(true);
     }
-
 }

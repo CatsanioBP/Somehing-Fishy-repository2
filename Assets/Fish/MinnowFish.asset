@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Minnow
   fishRarity: Common
   fishDesc: There's plenty of fish in the sea! But we all gotta start somewhere
+  fishIndexNum: 1

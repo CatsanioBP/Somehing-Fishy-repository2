@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Bolt fish
   fishRarity: Special
   fishDesc: Bolt fish dont strike the same hook twice
+  fishIndexNum: 15

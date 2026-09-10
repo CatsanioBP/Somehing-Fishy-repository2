@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Pufferfish
   fishRarity: Common
   fishDesc: Ow! Pricking people is rude yknow!
+  fishIndexNum: 3

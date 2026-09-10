@@ -89,20 +89,5 @@ public class Clickable : MonoBehaviour
                 world.inGame = false;
             }
         }
-
-    }
-
-    void OnMouseEnter()
-    {
-        if (isBucket == true)
-        {
-            anim.SetTrigger("moved");
-
-            if (particle)
-                Instantiate(particle, point.position, Quaternion.identity);
-
-            if (noise)
-                noise.Play();
-        }
     }
 }

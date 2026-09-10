@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: King of the pond
   fishRarity: Rare
   fishDesc: Self proclaimed king, his crown is actually made of paper
+  fishIndexNum: 10

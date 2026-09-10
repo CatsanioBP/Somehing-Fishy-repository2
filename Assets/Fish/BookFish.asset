@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Fisherature Book
   fishRarity: Uncommon
   fishDesc: The bookmarked page is said to hold a secret
+  fishIndexNum: 5

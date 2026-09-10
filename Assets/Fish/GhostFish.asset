@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Ghost fish
   fishRarity: Uncommon
   fishDesc: How did you even catch this fish?
+  fishIndexNum: 8

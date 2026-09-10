@@ -15,11 +15,11 @@ public class World : MonoBehaviour
     public bool CanGo = true,isBaitUsed; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
     public float chanceFromBait = 0;
     public float sizeHelper=0;
-    public GameObject congratsMenu,congratsReturn;
+    public GameObject congratsMenu,congratsReturn,enceclopedia;
     [SerializeField] TMP_Text congratsText;
     [SerializeField] Image congratsImage;
     public GameObject[] fish; // 0 is polderfish
-    public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point
+    public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point, 3 is enceclopedia
     public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
     public FishSCRobject[] comFishesPool,uncFishesPool,rarFishesPool,specFishesPool; //pools of fishes, common,uncommon,rare,special
     FishSCRobject currentFihStats;
@@ -249,7 +249,7 @@ public class World : MonoBehaviour
                 fih.transform.Rotate(0, 0, 360 * Time.deltaTime);
                 fih.transform.position = Vector2.Lerp(fihpos, props[1].position, tmr / 1f);
             }
-            
+            props[3].GetComponent<enceclopediaSCR>().AddFish(currentFihStats.fishIndexNum);
             isBaitUsed = true;
             Destroy(fih.gameObject);
             anims[1].SetTrigger("catch");
@@ -346,6 +346,10 @@ public class World : MonoBehaviour
     public void congrReturnButton()
     {
         congratsMenu.SetActive(!congratsMenu.activeSelf);
+    }
+    public void EnceclopediaButton()
+    { 
+        enceclopedia.SetActive(!enceclopedia.activeSelf);
     }
 
     IEnumerator slide(float slway)

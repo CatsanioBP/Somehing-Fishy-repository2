@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Alarm Fish
   fishRarity: Uncommon
   fishDesc: This fish actually can't tell time, we'll the right time atleast
+  fishIndexNum: 4

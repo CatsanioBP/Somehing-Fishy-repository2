@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Rotten fish
   fishRarity: Special
   fishDesc: Oh my god, you have to throw that back...or in the trash
+  fishIndexNum: 14

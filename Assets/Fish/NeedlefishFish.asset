@@ -18,3 +18,4 @@ MonoBehaviour:
   fishName: Needlefish
   fishRarity: Common
   fishDesc: Now all I need is a threadfish
+  fishIndexNum: 2
