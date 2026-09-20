@@ -4658,10 +4658,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -4678,8 +4678,8 @@ Canvas:
   m_GameObject: {fileID: 492526978}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -6970,10 +6970,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -6990,8 +6990,8 @@ Canvas:
   m_GameObject: {fileID: 851229332}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -9763,10 +9763,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -9783,8 +9783,8 @@ Canvas:
   m_GameObject: {fileID: 1237823868}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -10036,10 +10036,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -10056,8 +10056,8 @@ Canvas:
   m_GameObject: {fileID: 1267549645}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -11089,10 +11089,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -11109,8 +11109,8 @@ Canvas:
   m_GameObject: {fileID: 1405011163}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -11329,10 +11329,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -11349,8 +11349,8 @@ Canvas:
   m_GameObject: {fileID: 1436371989}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -12262,13 +12262,22 @@ MonoBehaviour:
   reeling: 0
   CanGo: 1
   isBaitUsed: 0
+  cursorHover: 0
+  throwing: 0
+  menued: 0
   chanceFromBait: 0
   sizeHelper: 0
+  upgradeNum: 0
+  lineSegments: 20
+  lineSag: 2.5
   congratsMenu: {fileID: 1707001710}
   congratsReturn: {fileID: 1024536967}
   enceclopedia: {fileID: 1266919730}
   congratsText: {fileID: 1433430143}
   congratsImage: {fileID: 2118759721}
+  dayDisplayer: {fileID: 0}
+  dialogue: {fileID: 4418367052226609988}
+  errorMessage: {fileID: 40763993}
   fish:
   - {fileID: 1826405858244644165, guid: 81c55b7a5c0ad648ea054ab495af3516, type: 3}
   props:
@@ -12280,6 +12289,10 @@ MonoBehaviour:
   - {fileID: 759831651}
   - {fileID: 210513547}
   - {fileID: 654473025}
+  miniGames:
+  - {fileID: 7882687118923288103, guid: d6355582e564611efa5bfb7f65b0e222, type: 3}
+  - {fileID: 842625969439943901, guid: bc0391d905ea44843a41e0c25eae0eeb, type: 3}
+  inventoryHolder: {fileID: 942820517}
   comFishesPool:
   - {fileID: 11400000, guid: a9857b233bb41ea458ef3a30ca3733fc, type: 2}
   - {fileID: 11400000, guid: 848715d44d6bcb04d99ca45866d4d82c, type: 2}
@@ -12298,15 +12311,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b9d9569558297fd4aa5ff786ad4ba001, type: 2}
   - {fileID: 11400000, guid: 343b3420c07241b4d8edb4592edb8137, type: 2}
   - {fileID: 11400000, guid: d9b0c096e67eb8543a5e73ff0c64006c, type: 2}
-  inventoryHolder: {fileID: 942820517}
-  cursorHover: 0
-  throwing: 0
-  menued: 0
-  dayDisplayer: {fileID: 0}
-  miniGames:
-  - {fileID: 7882687118923288103, guid: d6355582e564611efa5bfb7f65b0e222, type: 3}
-  - {fileID: 842625969439943901, guid: bc0391d905ea44843a41e0c25eae0eeb, type: 3}
-  dialogue: {fileID: 4418367052226609988}
   listOfAdvices:
   - The eye in the water blinked.
   - Fish don't normally leave footprints.
@@ -12342,15 +12346,13 @@ MonoBehaviour:
   - {fileID: 1605892895}
   - {fileID: 1300041027}
   - {fileID: 1961352186}
+  erorrAnim: {fileID: 40763995}
   audioSource: {fileID: 1555899726}
   actionBucket: {fileID: 8300000, guid: af7cbeac960307044ba25537441ac5ea, type: 3}
   swing: {fileID: 8300000, guid: 3ce1c079806008e439e785b529a9ebc6, type: 3}
   pushSound: {fileID: 8300000, guid: a5005409fc286fa45a53b23bee56ca2c, type: 3}
   releaseFSound: {fileID: 8300000, guid: 14aad97307531004aa8fb04875a5bf56, type: 3}
   fishFall: {fileID: 8300000, guid: 14b61710214185646b1acb89b0510871, type: 3}
-  errorMessage: {fileID: 40763993}
-  erorrAnim: {fileID: 40763995}
-  upgradeNum: 0
 --- !u!4 &1555899724
 Transform:
   m_ObjectHideFlags: 0
@@ -14084,10 +14086,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -14104,8 +14106,8 @@ Canvas:
   m_GameObject: {fileID: 1802648613}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1

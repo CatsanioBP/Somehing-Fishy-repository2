@@ -82,13 +82,13 @@ public class FishingSystem : MonoBehaviour
         if (success)
         {
             Debug.Log("Fish Caught!");
-            FindObjectOfType<World>().StartCoroutine(FindObjectOfType<World>().endGame(true));
+            FindObjectOfType<World>().StartCoroutine(FindObjectOfType<World>().EndGame(true));
             Destroy(gameObject);
         }
         else
         {
             Debug.Log("The fish got away!");
-            FindObjectOfType<World>().StartCoroutine(FindObjectOfType<World>().endGame(false));
+            FindObjectOfType<World>().StartCoroutine(FindObjectOfType<World>().EndGame(false));
             Destroy(gameObject);
         }
     }

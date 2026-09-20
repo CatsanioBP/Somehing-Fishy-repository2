@@ -112,7 +112,7 @@ public class Spinny : MonoBehaviour
         {
             World world = FindAnyObjectByType<World>();
 
-            world.StartCoroutine(world.endGame(true));
+            world.StartCoroutine(world.EndGame(true));
 
             Destroy(gameObject);
         }
@@ -121,7 +121,7 @@ public class Spinny : MonoBehaviour
         {
             World world = FindAnyObjectByType<World>();
 
-            world.StartCoroutine(world.endGame(false));
+            world.StartCoroutine(world.EndGame(false));
 
             Destroy(gameObject);
         }

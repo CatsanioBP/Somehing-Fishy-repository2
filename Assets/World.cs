@@ -10,277 +10,347 @@ using Random = UnityEngine.Random;
 
 public class World : MonoBehaviour
 {
-    public bool inGame, canFish = true, reeling; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
-    private bool rewardClaimed,dialogueSkipped = false;
-    public bool CanGo = true,isBaitUsed; // time doesnt pass when in game and stuff cant be interacted with, maybe the waves can still go tho idk
-    public float chanceFromBait = 0;
-    public float sizeHelper=0;
-    public GameObject congratsMenu,congratsReturn,enceclopedia;
-    [SerializeField] TMP_Text congratsText;
-    [SerializeField] Image congratsImage;
-    public GameObject[] fish; // 0 is polderfish
-    public Transform[] props; // 0 is bobber, 1 is fish bucket, 2 is the boys rod point, 3 is enceclopedia
-    public Transform[] rodpoints; // 0 is regular, 1 is reeling, 2 is tgrowing
-    public FishSCRobject[] comFishesPool,uncFishesPool,rarFishesPool,specFishesPool; //pools of fishes, common,uncommon,rare,special
-    FishSCRobject currentFihStats;
-    public Inventory inventoryHolder;
+    [Header("Game State")]
+    public bool inGame;
+    public bool canFish = true;
+    public bool reeling;
+    public bool CanGo = true;
+    public bool isBaitUsed;
     [HideInInspector] public bool cursorHover, throwing, menued;
     public static int dayOn = 1;
-    [SerializeField] TextMeshProUGUI dayDisplayer;
-    Transform cam;
-    Vector3 defaultCamPos;
-    LineRenderer lr;
-    public GameObject[] miniGames; // 0 is spinny, 1 is pully
-    [SerializeField] public GameObject dialogue;
-    public string[] listOfAdvices;
-    [SerializeField] Animator[] anims; // 0 is boy, 1 is bucket, 2 is sun, 3 is FadeOut/FadeIn
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip actionBucket,swing,pushSound,releaseFSound,fishFall;
-    [SerializeField] TMP_Text errorMessage;
-    [SerializeField] Animator erorrAnim;
+
+    [Header("Fishing Stats")]
+    public float chanceFromBait = 0;
+    public float sizeHelper = 0;
     public int upgradeNum = 0;
+
+    [Header("Fishing Line Settings")]
+    [Tooltip("How many points the line has. Higher = smoother curve.")]
+    public int lineSegments = 20;
+    [Tooltip("How far down the line hangs due to gravity.")]
+    public float lineSag = 2.5f;
+
+    [Header("UI References")]
+    public GameObject congratsMenu;
+    public GameObject congratsReturn;
+    public GameObject enceclopedia; // Kept original spelling
+    [SerializeField] private TMP_Text congratsText;
+    [SerializeField] private Image congratsImage;
+    [SerializeField] private TextMeshProUGUI dayDisplayer;
+    [SerializeField] private GameObject dialogue;
+    [SerializeField] private TMP_Text errorMessage;
+
+    [Header("Object References")]
+    public GameObject[] fish; // 0 is polderfish
+    public Transform[] props; // 0: bobber, 1: fish bucket, 2: boy's rod point, 3: encyclopedia
+    public Transform[] rodpoints; // 0: regular, 1: reeling, 2: throwing
+    public GameObject[] miniGames; // 0: spinny, 1: pully
+    public Inventory inventoryHolder;
+
+    [Header("Fish Pools")]
+    public FishSCRobject[] comFishesPool;
+    public FishSCRobject[] uncFishesPool;
+    public FishSCRobject[] rarFishesPool;
+    public FishSCRobject[] specFishesPool;
+    private FishSCRobject currentFihStats; // Kept original spelling
+
+    [Header("Audio & Animation")]
+    public string[] listOfAdvices;
+    [SerializeField] private Animator[] anims; // 0: boy, 1: bucket, 2: sun, 3: FadeOut/FadeIn
+    [SerializeField] private Animator erorrAnim; // Kept original spelling
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip actionBucket, swing, pushSound, releaseFSound, fishFall;
+
+    private bool rewardClaimed = true;
+    private bool dialogueSkipped = false;
+    private Camera mainCam;
+    private Vector3 defaultCamPos;
+    private LineRenderer lr;
 
     void Start()
     {
-        //canFish = CanGo = reeling = true;
-        //Debug.Log(" START values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo="+CanGo);
-        //inGame = true;
-        //Transition(true);
         rewardClaimed = true;
         isBaitUsed = true;
         lr = GetComponent<LineRenderer>();
         props[0].gameObject.SetActive(false);
-        cam = Camera.main.transform;
-        defaultCamPos = cam.transform.position;
+
+        mainCam = Camera.main; // Cache camera for better performance
+        defaultCamPos = mainCam.transform.position;
     }
-    
 
     void Update()
     {
-        //Debug.Log(" UPDATE values are inGame=" + inGame + " canFish=" + canFish + " reeling= " + reeling + " CanGo=" + CanGo);
-        if (Input.GetButton("Fire1"))
-        {
-            if (canFish && !inGame && !menued) 
-            {
-                anims[0].SetInteger("state", 1);
-                throwing = true;
-            }
-        }
-        
+        HandleInput();
+        HandleLineAndCamera();
+    }
 
-        if (Input.GetButtonUp("Fire1")) // throwing the line
+    private void HandleInput()
+    {
+        // Start Throwing
+        if (Input.GetButton("Fire1") && canFish && !inGame && !menued)
         {
-            if (canFish && !inGame && !menued && rewardClaimed)
-            {
-                if (Camera.main.ScreenToWorldPoint(Input.mousePosition).x > props[2].position.x + 1)
-                {
-                    CanGo = false;
-
-                    audioSource.PlayOneShot(swing);
-                    props[0].gameObject.SetActive(true);
-                    props[0].transform.position = props[2].transform.position;
-                    props[0].GetComponent<Rigidbody2D>().velocity = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - props[2].position) * 1.25f; // maybe better fishing lines throw farther
-                    canFish = false;
-                    StartCoroutine(castIt());
-                }
-                else
-                {
-                    anims[0].SetInteger("state", 0);
-                }
-            }
+            anims[0].SetInteger("state", 1);
+            throwing = true;
         }
 
+        // Release Throw
+        if (Input.GetButtonUp("Fire1") && canFish && !inGame && !menued && rewardClaimed)
+        {
+            Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+
+            if (mousePos.x > props[2].position.x + 1)
+            {
+                CanGo = false;
+                canFish = false;
+
+                audioSource.PlayOneShot(swing);
+                props[0].gameObject.SetActive(true);
+                props[0].transform.position = props[2].transform.position;
+
+                // Throw bobber
+                Rigidbody2D bobberRb = props[0].GetComponent<Rigidbody2D>();
+                bobberRb.velocity = (mousePos - props[2].position) * 1.25f;
+
+                StartCoroutine(CastLine());
+            }
+            else
+            {
+                anims[0].SetInteger("state", 0);
+            }
+        }
+    }
+
+    private void HandleLineAndCamera()
+    {
         if (!canFish)
         {
+            // Draw the curved fishing line
             lr.enabled = true;
-            lr.SetPosition(0, props[0].position);
-            lr.SetPosition(1, props[2].position);
+            DrawCurvedLine();
 
-            cam.position = Vector3.Lerp(cam.transform.position, new Vector3(Mathf.Clamp(props[0].position.x, 0, 80), defaultCamPos.y, -10), Time.deltaTime * 5);
+            // Follow bobber with camera
+            float clampedX = Mathf.Clamp(props[0].position.x, 0, 80);
+            mainCam.transform.position = Vector3.Lerp(mainCam.transform.position, new Vector3(clampedX, defaultCamPos.y, -10), Time.deltaTime * 5);
 
+            // Reel in / Catch
             if (!inGame && Input.GetButtonDown("Fire1") && !reeling)
             {
                 CanGo = false;
                 if (props[0].GetComponent<Bobber>().bob > 0)
                 {
-
-                    float distanceBoyBopper = Vector2.Distance(props[0].position, props[2].position);
-                    float whichPool = Random.Range(0, 50);
-
-                    whichPool += chanceFromBait + distanceBoyBopper;
-                    chanceFromBait = 0;
-                    //isBaitUsed = true;
-                    if (whichPool <= 50)
-                    {
-                        int randFih = Random.Range(0, comFishesPool.Length);
-                        currentFihStats = comFishesPool[randFih].Clone();
-                        //comFishesPool[randFih].minFishSize = Random.Range(comFishesPool[randFih].minFishSize, comFishesPool[randFih].minFishSize * 5);
-                        float currentFishSize = Random.Range(currentFihStats.minFishSize, currentFihStats.minFishSize + 2 + sizeHelper);
-                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
-
-                        //float finalFishPrice
-                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
-                        //currentFihStats = comFishesPool[randFih];
-
-                        currentFihStats.minFishSize = roundedNum;
-                        currentFihStats.fishPrice = finalPrice;
-
-                    }
-                    else if (whichPool > 50 && whichPool <= 85)
-                    {
-                        int randFih = Random.Range(0, uncFishesPool.Length);
-                        currentFihStats = uncFishesPool[randFih].Clone();
-                        float currentFishSize = Random.Range(uncFishesPool[randFih].minFishSize, uncFishesPool[randFih].minFishSize + 2);
-                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
-
-                        //float finalFishPrice
-                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
-                        //currentFihStats = uncFishesPool[randFih];
-
-                        currentFihStats.minFishSize = roundedNum;
-                        currentFihStats.fishPrice = finalPrice;
-                        //currentFihStats = uncFishesPool[randFih];
-                    }
-                    else if (whichPool > 85)
-                    {
-                        int randFih = Random.Range(0, rarFishesPool.Length);
-                        currentFihStats = rarFishesPool[randFih].Clone();
-                        float currentFishSize = Random.Range(rarFishesPool[randFih].minFishSize, rarFishesPool[randFih].minFishSize + 2);
-                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
-
-                        //float finalFishPrice
-                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
-                        //currentFihStats = rarFishesPool[randFih];
-
-                        currentFihStats.minFishSize = roundedNum;
-                        currentFihStats.fishPrice = finalPrice;
-                    }
-                    else if (whichPool < 0)
-                    {
-                        int randFih = Random.Range(0, 1000);
-                        if (randFih < 333)
-                        {
-                            randFih = 0;
-                        }
-                        if (randFih >= 333 && randFih < 666)
-                        {
-                            randFih = 1;
-                        }
-                        if (randFih >= 666 && randFih < 999)
-                        {
-                            randFih = 2;
-                        }
-                        if(randFih == 999)
-                        {
-                            randFih = 3;
-                        }
-                        currentFihStats = specFishesPool[randFih].Clone();
-                        float currentFishSize = Random.Range(specFishesPool[randFih].minFishSize, specFishesPool[randFih].minFishSize + 2 + upgradeNum);
-                        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
-
-                        //float finalFishPrice
-                        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
-                        //currentFihStats = rarFishesPool[randFih];
-
-                        currentFihStats.minFishSize = roundedNum;
-                        currentFihStats.fishPrice = finalPrice;
-                    }
-
-                    StartCoroutine(startGame());
+                    DetermineFishCaught();
+                    StartCoroutine(StartGame());
                 }
                 else
                 {
-                    StartCoroutine(endGame(false));
+                    StartCoroutine(EndGame(false));
                 }
             }
         }
         else
         {
             lr.enabled = false;
-            cam.position = Vector3.Lerp(cam.transform.position, defaultCamPos, Time.deltaTime * 5);
+            mainCam.transform.position = Vector3.Lerp(mainCam.transform.position, defaultCamPos, Time.deltaTime * 5);
         }
     }
 
-    public IEnumerator endGame(bool win, int fishType = 0)
+    // --- Curved Line Logic ---
+
+    private void DrawCurvedLine()
+    {
+        // Tell the LineRenderer how many points it will have
+        lr.positionCount = lineSegments;
+
+        Vector3 bobberPos = props[0].position;
+        Vector3 rodPos = props[2].position;
+
+        // Calculate the middle point between the rod and the bobber
+        Vector3 midPoint = (rodPos + bobberPos) / 2f;
+
+        // If we are reeling a fish in, the line is tight (0 sag). Otherwise, it sags.
+        float currentSag = reeling ? 0f : lineSag;
+
+        // Pull the middle point down to simulate gravity
+        midPoint.y -= currentSag;
+
+        // Draw the curve using the calculated points
+        for (int i = 0; i < lineSegments; i++)
+        {
+            // t goes from 0.0 to 1.0 depending on the current segment
+            float t = i / (float)(lineSegments - 1);
+
+            // Calculate the exact curve position for this segment
+            Vector3 curvePos = CalculateQuadraticBezierPoint(t, bobberPos, midPoint, rodPos);
+
+            lr.SetPosition(i, curvePos);
+        }
+    }
+
+    // The math formula for a Quadratic Bezier Curve
+    private Vector3 CalculateQuadraticBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2)
+    {
+        float u = 1 - t;
+        float tt = t * t;
+        float uu = u * u;
+
+        Vector3 p = uu * p0; // (1-t)^2 * P0
+        p += 2 * u * t * p1; // 2*(1-t)*t * P1
+        p += tt * p2;        // t^2 * P2
+
+        return p;
+    }
+
+    // --- Fish Catch Logic ---
+
+    private void DetermineFishCaught()
+    {
+        float distanceBoyBobber = Vector2.Distance(props[0].position, props[2].position);
+        float poolRoll = Random.Range(0, 50) + chanceFromBait + distanceBoyBobber;
+        chanceFromBait = 0;
+
+        if (poolRoll < 0)
+        {
+            int randFish = Random.Range(0, 1000);
+            int index = (randFish < 333) ? 0 : (randFish < 666) ? 1 : (randFish < 999) ? 2 : 3;
+            SetupFishStats(specFishesPool[index], upgradeNum);
+        }
+        else if (poolRoll <= 50)
+        {
+            SetupFishStats(comFishesPool[Random.Range(0, comFishesPool.Length)], sizeHelper);
+        }
+        else if (poolRoll <= 85)
+        {
+            SetupFishStats(uncFishesPool[Random.Range(0, uncFishesPool.Length)]);
+        }
+        else // > 85
+        {
+            SetupFishStats(rarFishesPool[Random.Range(0, rarFishesPool.Length)]);
+        }
+    }
+
+    private void SetupFishStats(FishSCRobject baseFish, float extraSize = 0)
+    {
+        currentFihStats = baseFish.Clone();
+
+        float currentFishSize = Random.Range(currentFihStats.minFishSize, currentFihStats.minFishSize + 2f + extraSize);
+        float roundedNum = Mathf.Round(currentFishSize * 10f) / 10f;
+        int finalPrice = Mathf.RoundToInt(currentFihStats.fishPrice * (roundedNum / currentFihStats.minFishSize));
+
+        currentFihStats.minFishSize = roundedNum;
+        currentFihStats.fishPrice = finalPrice;
+    }
+
+    // --- Coroutines ---
+
+    public IEnumerator StartGame()
+    {
+        audioSource.PlayOneShot(pushSound, 0.2f);
+        inGame = true;
+        int randomMinigame = Random.Range(0, 2);
+        Instantiate(miniGames[randomMinigame], new Vector3(mainCam.transform.position.x, 0, 0), Quaternion.identity);
+        yield return null;
+    }
+
+    public IEnumerator CastLine()
+    {
+        anims[0].SetTrigger("go");
+        props[2].position = rodpoints[2].position;
+
+        Bobber bobberScript = props[0].GetComponent<Bobber>();
+        while (!bobberScript.onWater)
+        {
+            yield return null;
+        }
+
+        anims[0].SetInteger("state", 0);
+        yield return new WaitForSeconds(1);
+        props[2].position = rodpoints[0].position;
+    }
+
+    public IEnumerator EndGame(bool win, int fishType = 0)
     {
         menued = true;
         reeling = true;
-        float tmr = 0;
         inGame = false;
+        float timer = 0;
 
         props[2].position = rodpoints[1].position;
         anims[0].SetInteger("state", 1);
 
-        if(win){
+        if (win)
+        {
             audioSource.Stop();
             audioSource.PlayOneShot(fishFall);
-            GameObject fih = Instantiate(fish[fishType], props[0].position, Quaternion.identity);
-            fih.GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
-            Vector2 fihpos = fih.transform.position;
 
-            while(tmr <= 1f){
-                yield return null;
-                tmr+=Time.deltaTime;
-                fih.transform.position = Vector2.Lerp(fihpos, props[0].position + new Vector3(0, 20, 0), tmr / 1f);
-                props[0].position = Vector2.Lerp(props[0].position, props[2].position, tmr / 2f);
-                fih.transform.Rotate(0, 0, 360 * Time.deltaTime);
+            GameObject caughtFish = Instantiate(fish[fishType], props[0].position, Quaternion.identity);
+            caughtFish.GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
+            Vector2 fishStartPos = caughtFish.transform.position;
 
-                if(Vector2.Distance(props[0].position, props[2].position) < 0.35f)
-                {
+            // Fish flies up to the player
+            while (timer <= 1f)
+            {
+                timer += Time.deltaTime;
+                caughtFish.transform.position = Vector2.Lerp(fishStartPos, props[0].position + new Vector3(0, 20, 0), timer);
+                props[0].position = Vector2.Lerp(props[0].position, props[2].position, timer / 2f);
+                caughtFish.transform.Rotate(0, 0, 360 * Time.deltaTime);
+
+                if (Vector2.Distance(props[0].position, props[2].position) < 0.35f)
                     props[0].gameObject.SetActive(false);
-                }
+
+                yield return null;
             }
-            
-            tmr = 0;
-            fih.transform.position = new Vector2(props[1].position.x, props[1].position.y + 20);
-            fihpos = fih.transform.position;
+
+            timer = 0;
+            caughtFish.transform.position = new Vector2(props[1].position.x, props[1].position.y + 20);
+            fishStartPos = caughtFish.transform.position;
             yield return new WaitForSeconds(0.5f);
-            
-            while(tmr <= 1f){
-                yield return null;
-                props[0].position = Vector2.Lerp(props[0].position, props[2].position, tmr / 2f);
 
-                if(Vector2.Distance(props[0].position, props[2].position) < 0.35f)
-                {
+            // Fish drops into bucket
+            while (timer <= 1f)
+            {
+                timer += Time.deltaTime;
+                props[0].position = Vector2.Lerp(props[0].position, props[2].position, timer / 2f);
+
+                if (Vector2.Distance(props[0].position, props[2].position) < 0.35f)
                     props[0].gameObject.SetActive(false);
-                }
 
-                tmr+=Time.deltaTime;
-                fih.transform.Rotate(0, 0, 360 * Time.deltaTime);
-                fih.transform.position = Vector2.Lerp(fihpos, props[1].position, tmr / 1f);
+                caughtFish.transform.Rotate(0, 0, 360 * Time.deltaTime);
+                caughtFish.transform.position = Vector2.Lerp(fishStartPos, props[1].position, timer);
+                yield return null;
             }
+
             props[3].GetComponent<enceclopediaSCR>().AddFish(currentFihStats.fishIndexNum);
             isBaitUsed = true;
-            Destroy(fih.gameObject);
+            Destroy(caughtFish);
+
             anims[1].SetTrigger("catch");
             audioSource.PlayOneShot(actionBucket);
-            dialogue.GetComponent<Referencer>().things[0].GetComponent<TextMeshPro>().text = listOfAdvices[Random.Range(0, listOfAdvices.Length)];
-            dialogue.GetComponent<Referencer>().things[1].GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
-            dialogue.GetComponent<Referencer>().things[2].GetComponent<TextMeshPro>().text = currentFihStats.fishName;
+
+            // Setup dialogue
+            Referencer diagRefs = dialogue.GetComponent<Referencer>();
+            diagRefs.things[0].GetComponent<TextMeshPro>().text = listOfAdvices[Random.Range(0, listOfAdvices.Length)];
+            diagRefs.things[1].GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
+            diagRefs.things[2].GetComponent<TextMeshPro>().text = currentFihStats.fishName;
+
             dialogueSkipped = false;
-            
-            StartCoroutine(slide(1));
-            if (dialogueSkipped == true)
+            StartCoroutine(SlideDialogue(1));
+
+            if (dialogueSkipped)
             {
-                congratsImage.sprite = currentFihStats.fishSprite;
-                congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
-                congratsMenu.SetActive(true);
-                anims[2].SetTrigger("SunSurprised");
-                CanGo = true;
-                rewardClaimed = false;
-                inGame = false;
+                ShowCongratsMenu();
             }
         }
         else
         {
             CanGo = true;
             audioSource.Stop();
-            // play a dissapointing "kwaow"
             anims[2].SetTrigger("SunSad");
-            while(tmr <= 1f){
+
+            while (timer <= 1f)
+            {
+                timer += Time.deltaTime;
+                props[0].position = Vector2.Lerp(props[0].position, props[2].position, timer);
                 yield return null;
-                tmr+=Time.deltaTime;
-                props[0].position = Vector2.Lerp(props[0].position, props[2].position, tmr / 1f);
             }
 
             props[0].gameObject.SetActive(false);
@@ -288,40 +358,74 @@ public class World : MonoBehaviour
         }
 
         anims[0].SetInteger("state", 0);
-
         canFish = true;
         reeling = false;
     }
-    public IEnumerator startGame()
+
+    // --- UI Button Methods ---
+    IEnumerator SlideDialogue(float directionMultipler)
     {
-        audioSource.PlayOneShot(pushSound,0.2f);
-        inGame = true;
-        int x = Random.Range(0, 2); //x is a num that chooses random minigame,for now we have to so it'd from 0 to 2(1-SV,0-Spinny)
-        Instantiate(miniGames[x], new Vector3(cam.position.x, 0, 0), Quaternion.identity);
-        yield return null;
-    }
-    public IEnumerator castIt()
-    {
-       
-        anims[0].SetTrigger("go");
-        props[2].position = rodpoints[2].position;
-        while (!props[0].GetComponent<Bobber>().onWater)
+        if (directionMultipler == 1) dialogue.SetActive(true);
+
+        float timer = 0;
+        Vector2 targetOffset = new Vector2(0, -5 + directionMultipler * 2);
+
+        while (timer < 1.5f)
+        {
+            dialogue.transform.position = Vector2.Lerp(dialogue.transform.position,
+                new Vector2(mainCam.transform.position.x + targetOffset.x, mainCam.transform.position.y + targetOffset.y),
+                Time.deltaTime * 2);
+            timer += Time.deltaTime;
             yield return null;
-        anims[0].SetInteger("state", 0);
-        yield return new WaitForSeconds(1);
-        props[2].position = rodpoints[0].position;
+        }
+
+        if (directionMultipler == -1)
+        {
+            dialogue.SetActive(false);
+            ShowCongratsMenu();
+        }
+
+        if (directionMultipler == 1)
+        {
+            bool skipped = false;
+            while (!skipped)
+            {
+                canFish = false;
+                CanGo = false;
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    dialogueSkipped = true;
+                    skipped = true;
+                }
+                yield return null;
+            }
+            StartCoroutine(SlideDialogue(-1));
+        }
+
+        canFish = true;
+    }
+
+    private void ShowCongratsMenu()
+    {
+        congratsImage.sprite = currentFihStats.fishSprite;
+        congratsText.text = $"{currentFihStats.fishName}\n{currentFihStats.fishRarity}\n{currentFihStats.minFishSize}\n{currentFihStats.fishPrice}";
+        congratsMenu.SetActive(true);
+        anims[2].SetTrigger("SunSurprised");
+        isBaitUsed = true;
+        CanGo = true;
+        rewardClaimed = false;
+        inGame = false;
     }
     public void TrashFish()
     {
-        
         congratsReturn.SetActive(false);
         audioSource.PlayOneShot(releaseFSound);
         congratsMenu.SetActive(false);
         CanGo = true;
-        //inGame = false;
         rewardClaimed = true;
         menued = false;
     }
+
     public void KeepFish()
     {
         if (inventoryHolder.sizeOfInventory >= currentFihStats.minFishSize)
@@ -330,9 +434,7 @@ public class World : MonoBehaviour
             inventoryHolder.AddItem(currentFihStats);
             congratsMenu.SetActive(false);
             CanGo = true;
-            //canFish = true;
             rewardClaimed = true;
-            //inGame = false;
             menued = false;
         }
         else
@@ -343,64 +445,26 @@ public class World : MonoBehaviour
             congratsMenu.SetActive(false);
         }
     }
-    public void congrReturnButton()
+
+    public void CongrReturnButton() => StartCoroutine(CongrReturnCoroutine());
+
+    IEnumerator CongrReturnCoroutine()
     {
-        congratsMenu.SetActive(!congratsMenu.activeSelf);
+        Time.timeScale = 0;
+        enceclopedia.SetActive(!congratsMenu.activeSelf);
+        yield return new WaitForSecondsRealtime(0.5f);
+        //Debug.Log("Works");
+        Time.timeScale = 1;
     }
-    public void EnceclopediaButton()
-    { 
+
+    public void EnceclopediaButton() => StartCoroutine(EnceclopediaCoroutine());
+    
+    IEnumerator EnceclopediaCoroutine() 
+    {
+        Time.timeScale = 0;
         enceclopedia.SetActive(!enceclopedia.activeSelf);
-    }
-
-    IEnumerator slide(float slway)
-    {
-       
-        if (slway == 1)
-            dialogue.SetActive(true);
-
-        float tmr = 0;
-        Vector2 wherego = new Vector2(0, -5 + slway * 2);
-
-        while (tmr < 1.5f)
-        {
-            yield return null;
-            dialogue.transform.position = Vector2.Lerp(dialogue.transform.position, new Vector2(cam.transform.position.x + wherego.x, cam.transform.position.y + wherego.y), Time.deltaTime * 2);
-            tmr += Time.deltaTime;
-        }
-
-        if (slway == -1)
-        {
-            dialogue.SetActive(false);
-            congratsImage.sprite = currentFihStats.fishSprite;
-            congratsText.text = currentFihStats.fishName + "\n" + currentFihStats.fishRarity + "\n" + currentFihStats.minFishSize + "\n" + currentFihStats.fishPrice;
-            congratsMenu.SetActive(true);
-            anims[2].SetTrigger("SunSurprised");
-            isBaitUsed = true;
-            CanGo = true;
-            rewardClaimed = false;
-            inGame = false;
-        }
-
-            bool o = false;
-
-        if (slway == 1)
-        {
-            while (!o)
-            {
-                canFish = false;
-                CanGo = false;
-                if (Input.GetButtonDown("Fire1"))
-                {
-                    dialogueSkipped = true;
-                    o = true;
-                }
-                   
-                yield return null;
-            }
-
-            StartCoroutine(slide(-1));
-        }
-
-        canFish = true;
+        yield return new WaitForSecondsRealtime(0.5f);
+        //Debug.Log("Works");
+        Time.timeScale = 1;
     }
 }
