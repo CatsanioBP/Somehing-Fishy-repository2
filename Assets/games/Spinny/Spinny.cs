@@ -11,10 +11,10 @@ public class Spinny : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] float successNeeded = 100f;
-    [SerializeField] float failNeeded = 100f;
+    [SerializeField] float failNeeded = 0f;
 
-    [SerializeField] float progressSpeed = 30f;
-    [SerializeField] float failSpeed = 40f;
+    [SerializeField] float progressSpeed = 5f;
+    [SerializeField] float failSpeed = 10f;
     [SerializeField] float failDecayPerSecond = 15f;
 
     [SerializeField] int direction = 1; // 1 = clockwise, -1 = counterclockwise
@@ -32,11 +32,11 @@ public class Spinny : MonoBehaviour
                       Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         lastAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-
+        
         progressSlider.maxValue = successNeeded;
         failSlider.maxValue = failNeeded;
 
-        progressSlider.value = 0;
+        progressSlider.value = 30;
         failSlider.value = 0;
     }
 
@@ -47,6 +47,7 @@ public class Spinny : MonoBehaviour
         UpdateSpinner();
         UpdateArrow();
 
+        progressSlider.value -= failSpeed * Time.deltaTime;
         failSlider.value = Mathf.Max(
             0,
             failSlider.value - failDecayPerSecond * Time.deltaTime
@@ -73,17 +74,19 @@ public class Spinny : MonoBehaviour
         {
             bool correctDirection =
                 Mathf.Sign(delta) == direction;
+           // Debug.Log(direction);
+            //Debug.Log(correctDirection);
 
             if (correctDirection)
             {
                 progressSlider.value +=
                     Mathf.Abs(delta) * progressSpeed * Time.deltaTime;
             }
-            else
-            {
-                failSlider.value +=
-                    Mathf.Abs(delta) * failSpeed * Time.deltaTime;
-            }
+           //else
+           //{
+           //    progressSlider.value -=
+           //        Mathf.Abs(delta) * failSpeed;
+           //}
         }
 
         lastAngle = currentAngle;
@@ -108,7 +111,7 @@ public class Spinny : MonoBehaviour
 
     void CheckWinLose()
     {
-        if (progressSlider.value >= successNeeded)
+        if (progressSlider.value >= successNeeded - 1)
         {
             World world = FindAnyObjectByType<World>();
 
@@ -117,7 +120,7 @@ public class Spinny : MonoBehaviour
             Destroy(gameObject);
         }
 
-        if (failSlider.value >= failNeeded)
+        if (progressSlider.value <= 0)
         {
             World world = FindAnyObjectByType<World>();
 

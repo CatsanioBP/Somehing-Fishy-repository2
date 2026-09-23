@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712e6276bd75f5e4fac8f9a83e8ee80c, type: 3}
+  m_Name: TomogochiFish
+  m_EditorClassIdentifier: 
+  fishSprite: {fileID: 593753183, guid: eb250ee6dfba25246ae52c789fafbb0e, type: 3}
+  fishPrice: 35
+  minFishSize: 0.5
+  fishName: TomogochiFish
+  fishRarity: Rare
+  fishDesc: It was popular in it's time,but people forget things...
+  fishIndexNum: 18

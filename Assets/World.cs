@@ -451,7 +451,8 @@ public class World : MonoBehaviour
     IEnumerator CongrReturnCoroutine()
     {
         Time.timeScale = 0;
-        enceclopedia.SetActive(!congratsMenu.activeSelf);
+        congratsMenu.SetActive(!congratsMenu.activeSelf);
+        Debug.Log("works");
         yield return new WaitForSecondsRealtime(0.5f);
         //Debug.Log("Works");
         Time.timeScale = 1;

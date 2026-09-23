@@ -818,7 +818,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &46500104
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4690,7 +4690,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 40
   m_TargetDisplay: 0
 --- !u!224 &492526982
 RectTransform:
@@ -7766,7 +7766,7 @@ MonoBehaviour:
   balance: 0
   inventory:
   - {fileID: 0}
-  sizeOfInventory: 30
+  sizeOfInventory: 0
   icons: 10
   inventoryPanel:
   - {fileID: 191450080}
@@ -8310,7 +8310,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1555899723}
         m_TargetAssemblyTypeName: World, Assembly-CSharp
-        m_MethodName: congrReturnButton
+        m_MethodName: CongrReturnButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10068,7 +10068,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 80
   m_TargetDisplay: 0
 --- !u!224 &1267549649
 RectTransform:
@@ -10115,7 +10115,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1272247313
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11121,7 +11121,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 80
   m_TargetDisplay: 0
 --- !u!224 &1405011167
 RectTransform:
@@ -12291,7 +12291,7 @@ MonoBehaviour:
   - {fileID: 654473025}
   miniGames:
   - {fileID: 7882687118923288103, guid: d6355582e564611efa5bfb7f65b0e222, type: 3}
-  - {fileID: 842625969439943901, guid: bc0391d905ea44843a41e0c25eae0eeb, type: 3}
+  - {fileID: 7882687118923288103, guid: d6355582e564611efa5bfb7f65b0e222, type: 3}
   inventoryHolder: {fileID: 942820517}
   comFishesPool:
   - {fileID: 11400000, guid: a9857b233bb41ea458ef3a30ca3733fc, type: 2}
@@ -14118,7 +14118,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 50
   m_TargetDisplay: 0
 --- !u!224 &1802648617
 RectTransform:
