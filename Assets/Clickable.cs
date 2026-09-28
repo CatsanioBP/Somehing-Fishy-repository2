@@ -3,91 +3,119 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 //using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Clickable : MonoBehaviour
 {
-    [SerializeField] GameObject inventory,description,baitMenu,baitDesc;
-    Animator anim;
-    [SerializeField] GameObject particle;
-    [SerializeField] Transform point;
-    [SerializeField] bool isBucket;
-    AudioSource noise;
-    BoxCollider2D box;
-    bool good;
+    [Header("UI Panels")]
+    [SerializeField] private GameObject inventory, description, baitMenu, baitDesc;
+
+    [Header("Bucket Settings")]
+    [SerializeField] private bool isBucket;
+    [SerializeField] private GameObject particle;
+    [SerializeField] private Transform point;
+
+    private Animator anim;
+    private AudioSource noise;
+    private BoxCollider2D box;
+    private World world;
+
+    private bool canPlayHoverEffect = true;
 
     void Start()
     {
-        if (isBucket == true)
+        // Cache the World script once. Finding it every single click is terrible for performance!
+        world = FindAnyObjectByType<World>();
+        box = GetComponent<BoxCollider2D>();
+
+        if (isBucket)
         {
             anim = GetComponent<Animator>();
-            if (!point)
-                point = transform;
             noise = GetComponent<AudioSource>();
+            if (point == null) point = transform;
         }
-        box = GetComponent<BoxCollider2D>();
     }
 
     void Update()
     {
-        if (isBucket == true)
+        if (isBucket)
         {
-            if (box.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            if (box.OverlapPoint(mousePos))
             {
-                if (!good)
+                // FIXED: Your old "good" boolean was instantly setting itself back to false, 
+                // causing the animation, particles, and sound to spam every single frame the mouse hovered.
+                if (canPlayHoverEffect)
                 {
-                    good = false;
+                    canPlayHoverEffect = false;
                     anim.SetTrigger("moved");
 
-                    if (particle)
-                        Instantiate(particle, point.position, Quaternion.identity);
-
-                    if (noise)
-                        noise.Play();
+                    if (particle != null) Instantiate(particle, point.position, Quaternion.identity);
+                    if (noise != null) noise.Play();
                 }
             }
             else
-                good = true;
+            {
+                // Reset the effect only when the mouse completely leaves the object
+                canPlayHoverEffect = true;
+            }
         }
     }
+
     private void OnMouseDown()
     {
-        World world = Object.FindAnyObjectByType<World>();
-        if (gameObject.CompareTag("Inventory"))
-        {
-            if (world.inGame == false && inventory.activeInHierarchy == false)
-            {
-                world.menued = true;
-                inventory.SetActive(!inventory.activeSelf);
-                description.SetActive(false);
-                world.inGame = true;
-            }
-            else if (inventory.activeInHierarchy == true)
-            {
-               
-                inventory.SetActive(!inventory.activeSelf);
-                description.SetActive(false);
-                world.inGame = false;
-                world.menued = false;
-            }
-        }
-        if (gameObject.CompareTag("BaitMenu"))
-        {
-           
-            if (world.inGame == false && baitMenu.activeInHierarchy == false)
-            {
-                world.menued = true;
-                baitMenu.SetActive(!baitMenu.activeSelf);
-                baitDesc.SetActive(false);
-                world.inGame = true;
-            }
+        bool isInventory = gameObject.CompareTag("Inventory");
+        bool isBaitMenu = gameObject.CompareTag("BaitMenu");
 
-            else if (baitMenu.activeInHierarchy == true)
-            {
-                world.menued = false;
-                baitMenu.SetActive(!baitMenu.activeSelf);
-                baitDesc.SetActive(false);
-                world.inGame = false;
-            }
+        // Check if the menu this specific object controls is currently open
+        bool menuIsAlreadyOpen = (isInventory && inventory.activeSelf) || (isBaitMenu && baitMenu.activeSelf);
+
+        // Block the click IF the mouse is over a UI element AND the menu isn't already open
+        if (!menuIsAlreadyOpen && EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
         }
+
+        // Pass the target menu first, and the opposite menu second so it knows what to close
+        if (isInventory)
+        {
+            ToggleMenu(inventory, description, baitMenu, baitDesc);
+        }
+        else if (isBaitMenu)
+        {
+            ToggleMenu(baitMenu, baitDesc, inventory, description);
+        }
+    }
+
+    // Updated to accept the "other" menu and description
+    private void ToggleMenu(GameObject menuToToggle, GameObject descToClose, GameObject otherMenu, GameObject otherDesc)
+    {
+        bool isOpening = !menuToToggle.activeSelf;
+
+        if (isOpening)
+        {
+            // Force close the opposite menu so they cannot be open at the same time
+            otherMenu.SetActive(false);
+            otherDesc.SetActive(false);
+        }
+
+        menuToToggle.SetActive(isOpening);
+        descToClose.SetActive(false);
+
+        world.menued = isOpening;
+        world.inGame = isOpening;
+    }
+
+    // Helper method to keep your code clean and prevent writing the exact same logic twice
+    private void ToggleMenu(GameObject menuToToggle, GameObject descToClose)
+    {
+        bool isOpening = !menuToToggle.activeSelf;
+
+        menuToToggle.SetActive(isOpening);
+        descToClose.SetActive(false);
+
+        world.menued = isOpening;
+        world.inGame = isOpening;
     }
 }

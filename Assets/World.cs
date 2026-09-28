@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using UnityEngine.EventSystems;
 
 public class World : MonoBehaviour
 {
@@ -52,7 +54,7 @@ public class World : MonoBehaviour
     public FishSCRobject[] uncFishesPool;
     public FishSCRobject[] rarFishesPool;
     public FishSCRobject[] specFishesPool;
-    private FishSCRobject currentFihStats; // Kept original spelling
+    private FishSCRobject currentFihStats;
 
     [Header("Audio & Animation")]
     public string[] listOfAdvices;
@@ -66,6 +68,7 @@ public class World : MonoBehaviour
     private Camera mainCam;
     private Vector3 defaultCamPos;
     private LineRenderer lr;
+    [SerializeField] private LayerMask ignoreClickLayer;
 
     void Start()
     {
@@ -86,22 +89,48 @@ public class World : MonoBehaviour
 
     private void HandleInput()
     {
-        // Start Throwing
-        if (Input.GetButton("Fire1") && canFish && !inGame && !menued)
+        // 1. Guard Clause: If we can't fish, or menus are open, exit immediately.
+        if (!canFish || inGame || menued)
+        {
+            return;
+        }
+
+        // 2. Prevent clicking through UI buttons/sliders
+        if (UnityEngine.EventSystems.EventSystem.current != null &&
+            UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        // 3. Calculate mouse position and Raycast exactly ONCE for the whole method
+        Vector2 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        bool hittingIgnoredObject = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, ignoreClickLayer).collider != null;
+
+        // --- Start Throwing Windup ---
+        // (Consider changing GetButton to GetButtonDown so it only triggers once per click)
+        if (Input.GetButton("Fire1") && !hittingIgnoredObject)
         {
             anims[0].SetInteger("state", 1);
             throwing = true;
         }
 
-        // Release Throw
-        if (Input.GetButtonUp("Fire1") && canFish && !inGame && !menued && rewardClaimed)
+        // --- Release Throw ---
+        if (Input.GetButtonUp("Fire1"))
         {
-            Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+            // If the player can't cast yet, or released the mouse over a shop, cancel the throw
+            if (!rewardClaimed || hittingIgnoredObject)
+            {
+                anims[0].SetInteger("state", 0);
+                throwing = false;
+                return;
+            }
 
+            // Successful throw (Mouse is far enough right)
             if (mousePos.x > props[2].position.x + 1)
             {
                 CanGo = false;
                 canFish = false;
+                throwing = false; // Reset throwing state!
 
                 audioSource.PlayOneShot(swing);
                 props[0].gameObject.SetActive(true);
@@ -109,13 +138,14 @@ public class World : MonoBehaviour
 
                 // Throw bobber
                 Rigidbody2D bobberRb = props[0].GetComponent<Rigidbody2D>();
-                bobberRb.velocity = (mousePos - props[2].position) * 1.25f;
+                bobberRb.velocity = (mousePos - (Vector2)props[2].position) * 1.25f;
 
                 StartCoroutine(CastLine());
             }
-            else
+            else // Cancelled throw (Didn't aim far enough)
             {
                 anims[0].SetInteger("state", 0);
+                throwing = false;
             }
         }
     }
