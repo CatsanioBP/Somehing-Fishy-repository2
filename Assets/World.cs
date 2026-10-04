@@ -28,14 +28,14 @@ public class World : MonoBehaviour
 
     [Header("Fishing Line Settings")]
     [Tooltip("How many points the line has. Higher = smoother curve.")]
-    public int lineSegments = 20;
+    public int lineSegments = 30;
     [Tooltip("How far down the line hangs due to gravity.")]
-    public float lineSag = 2.5f;
+    public float lineSag = 2f;
 
     [Header("UI References")]
     public GameObject congratsMenu;
     public GameObject congratsReturn;
-    public GameObject enceclopedia; // Kept original spelling
+    public GameObject enceclopedia;
     [SerializeField] private TMP_Text congratsText;
     [SerializeField] private Image congratsImage;
     [SerializeField] private TextMeshProUGUI dayDisplayer;
@@ -57,9 +57,9 @@ public class World : MonoBehaviour
     private FishSCRobject currentFihStats;
 
     [Header("Audio & Animation")]
-    public string[] listOfAdvices;
+    //public string[] listOfAdvices;
     [SerializeField] private Animator[] anims; // 0: boy, 1: bucket, 2: sun, 3: FadeOut/FadeIn
-    [SerializeField] private Animator erorrAnim; // Kept original spelling
+    [SerializeField] private Animator erorrAnim;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip actionBucket, swing, pushSound, releaseFSound, fishFall;
 
@@ -107,15 +107,14 @@ public class World : MonoBehaviour
         bool hittingIgnoredObject = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, ignoreClickLayer).collider != null;
 
         // --- Start Throwing Windup ---
-        // (Consider changing GetButton to GetButtonDown so it only triggers once per click)
-        if (Input.GetButton("Fire1") && !hittingIgnoredObject)
+        if (Input.GetButtonDown("Fire1") && !hittingIgnoredObject)
         {
             anims[0].SetInteger("state", 1);
             throwing = true;
         }
 
         // --- Release Throw ---
-        if (Input.GetButtonUp("Fire1"))
+        if (Input.GetButtonUp("Fire1") && throwing)
         {
             // If the player can't cast yet, or released the mouse over a shop, cancel the throw
             if (!rewardClaimed || hittingIgnoredObject)
@@ -132,15 +131,8 @@ public class World : MonoBehaviour
                 canFish = false;
                 throwing = false; // Reset throwing state!
 
-                audioSource.PlayOneShot(swing);
-                props[0].gameObject.SetActive(true);
-                props[0].transform.position = props[2].transform.position;
-
-                // Throw bobber
-                Rigidbody2D bobberRb = props[0].GetComponent<Rigidbody2D>();
-                bobberRb.velocity = (mousePos - (Vector2)props[2].position) * 1.25f;
-
-                StartCoroutine(CastLine());
+                // Start the coroutine and pass the target mouse position
+                StartCoroutine(CastLine(mousePos));
             }
             else // Cancelled throw (Didn't aim far enough)
             {
@@ -281,19 +273,39 @@ public class World : MonoBehaviour
         yield return null;
     }
 
-    public IEnumerator CastLine()
+    public IEnumerator CastLine(Vector2 targetPos)
     {
-        anims[0].SetTrigger("go");
+
         props[2].position = rodpoints[2].position;
+        Debug.Log(props[2].position);
+        //anims[0].SetTrigger("go");
+        anims[0].SetInteger("state", 3);
+        
+        // UPDATE THE ROD POINT POSITION IMMEDIATELY HERE
+        //props[2].position = rodpoints[2].position;
+
+        // Wait briefly for the throw animation to reach the "release" frame
+        //yield return new WaitForSeconds(0.15f);
+        //Debug.Log(props[2].position);
+
+        // Launch the bobber AFTER the delay
+        audioSource.PlayOneShot(swing);
+        props[0].gameObject.SetActive(true);
+        props[0].transform.position = props[2].transform.position;
+
+        Rigidbody2D bobberRb = props[0].GetComponent<Rigidbody2D>();
+        bobberRb.velocity = (targetPos - (Vector2)props[2].position) * 1.25f;
 
         Bobber bobberScript = props[0].GetComponent<Bobber>();
+        //anims[0].SetInteger("state", 0);
+        //anims[0].SetInteger("state", 0);
+        //props[2].position = rodpoints[0].position;
         while (!bobberScript.onWater)
         {
             yield return null;
         }
-
         anims[0].SetInteger("state", 0);
-        yield return new WaitForSeconds(1);
+        //anims[0].SetInteger("state", 0);
         props[2].position = rodpoints[0].position;
     }
 
@@ -303,9 +315,10 @@ public class World : MonoBehaviour
         reeling = true;
         inGame = false;
         float timer = 0;
-
-        props[2].position = rodpoints[1].position;
         anims[0].SetInteger("state", 1);
+        yield return new WaitForSeconds(0.2f);
+        props[2].position = rodpoints[1].position;
+       
 
         if (win)
         {
@@ -356,19 +369,19 @@ public class World : MonoBehaviour
             anims[1].SetTrigger("catch");
             audioSource.PlayOneShot(actionBucket);
 
-            // Setup dialogue
-            Referencer diagRefs = dialogue.GetComponent<Referencer>();
-            diagRefs.things[0].GetComponent<TextMeshPro>().text = listOfAdvices[Random.Range(0, listOfAdvices.Length)];
-            diagRefs.things[1].GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
-            diagRefs.things[2].GetComponent<TextMeshPro>().text = currentFihStats.fishName;
+           //// Setup dialogue
+           //Referencer diagRefs = dialogue.GetComponent<Referencer>();
+           //diagRefs.things[0].GetComponent<TextMeshPro>().text = listOfAdvices[Random.Range(0, listOfAdvices.Length)];
+           //diagRefs.things[1].GetComponent<SpriteRenderer>().sprite = currentFihStats.fishSprite;
+           //diagRefs.things[2].GetComponent<TextMeshPro>().text = currentFihStats.fishName;
+           //
+           //dialogueSkipped = false;
+           //StartCoroutine(SlideDialogue(1));
 
-            dialogueSkipped = false;
-            StartCoroutine(SlideDialogue(1));
-
-            if (dialogueSkipped)
-            {
+            //if (dialogueSkipped)
+            //{
                 ShowCongratsMenu();
-            }
+            //}
         }
         else
         {
@@ -393,47 +406,47 @@ public class World : MonoBehaviour
     }
 
     // --- UI Button Methods ---
-    IEnumerator SlideDialogue(float directionMultipler)
-    {
-        if (directionMultipler == 1) dialogue.SetActive(true);
-
-        float timer = 0;
-        Vector2 targetOffset = new Vector2(0, -5 + directionMultipler * 2);
-
-        while (timer < 1.5f)
-        {
-            dialogue.transform.position = Vector2.Lerp(dialogue.transform.position,
-                new Vector2(mainCam.transform.position.x + targetOffset.x, mainCam.transform.position.y + targetOffset.y),
-                Time.deltaTime * 2);
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        if (directionMultipler == -1)
-        {
-            dialogue.SetActive(false);
-            ShowCongratsMenu();
-        }
-
-        if (directionMultipler == 1)
-        {
-            bool skipped = false;
-            while (!skipped)
-            {
-                canFish = false;
-                CanGo = false;
-                if (Input.GetButtonDown("Fire1"))
-                {
-                    dialogueSkipped = true;
-                    skipped = true;
-                }
-                yield return null;
-            }
-            StartCoroutine(SlideDialogue(-1));
-        }
-
-        canFish = true;
-    }
+    //IEnumerator SlideDialogue(float directionMultipler)
+    //{
+    //    if (directionMultipler == 1) dialogue.SetActive(true);
+    //
+    //    float timer = 0;
+    //    Vector2 targetOffset = new Vector2(0, -5 + directionMultipler * 2);
+    //
+    //    while (timer < 1.5f)
+    //    {
+    //        dialogue.transform.position = Vector2.Lerp(dialogue.transform.position,
+    //            new Vector2(mainCam.transform.position.x + targetOffset.x, mainCam.transform.position.y + targetOffset.y),
+    //            Time.deltaTime * 2);
+    //        timer += Time.deltaTime;
+    //        yield return null;
+    //    }
+    //
+    //    if (directionMultipler == -1)
+    //    {
+    //        dialogue.SetActive(false);
+    //        ShowCongratsMenu();
+    //    }
+    //
+    //    if (directionMultipler == 1)
+    //    {
+    //        bool skipped = false;
+    //        while (!skipped)
+    //        {
+    //            canFish = false;
+    //            CanGo = false;
+    //            if (Input.GetButtonDown("Fire1"))
+    //            {
+    //                dialogueSkipped = true;
+    //                skipped = true;
+    //            }
+    //            yield return null;
+    //        }
+    //        StartCoroutine(SlideDialogue(-1));
+    //    }
+    //
+    //    canFish = true;
+    //}
 
     private void ShowCongratsMenu()
     {
@@ -446,6 +459,7 @@ public class World : MonoBehaviour
         rewardClaimed = false;
         inGame = false;
     }
+
     public void TrashFish()
     {
         congratsReturn.SetActive(false);
@@ -482,20 +496,17 @@ public class World : MonoBehaviour
     {
         Time.timeScale = 0;
         congratsMenu.SetActive(!congratsMenu.activeSelf);
-        Debug.Log("works");
         yield return new WaitForSecondsRealtime(0.5f);
-        //Debug.Log("Works");
         Time.timeScale = 1;
     }
 
     public void EnceclopediaButton() => StartCoroutine(EnceclopediaCoroutine());
-    
-    IEnumerator EnceclopediaCoroutine() 
+
+    IEnumerator EnceclopediaCoroutine()
     {
         Time.timeScale = 0;
         enceclopedia.SetActive(!enceclopedia.activeSelf);
         yield return new WaitForSecondsRealtime(0.5f);
-        //Debug.Log("Works");
         Time.timeScale = 1;
     }
 }

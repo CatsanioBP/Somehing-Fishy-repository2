@@ -10,6 +10,7 @@ public class Bobber : MonoBehaviour
     [SerializeField] LayerMask myself;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip actionSoundClip,lurring;
+    [SerializeField] private Animator catchSighAnim;
 
     void Update()
     {
@@ -22,11 +23,13 @@ public class Bobber : MonoBehaviour
 
             if (waitTime <= 0)
             {
+                
                 if (waitTime > -15)
                 {
                     bob = 0.75f;
+                    catchSighAnim.SetTrigger("Bob");
                 }
-
+                
                 waitTime = Random.Range(0.9f, 10.2f - bobberHelp);
             }
 
@@ -37,7 +40,9 @@ public class Bobber : MonoBehaviour
                 bob -= Time.deltaTime;
             }
 
+            
             gfx.localPosition = new Vector2(0, -Mathf.Sin(bob * Mathf.PI / 0.75f) * 0.6f);
+
         }
         else
         {
